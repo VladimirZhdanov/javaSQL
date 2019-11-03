@@ -1,8 +1,6 @@
 package com.foxminded.university;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,19 +13,32 @@ import java.util.Set;
  * @since 0.1
  */
 public class GenerateTestData {
-    private List<String> firstNames;
-    private List<String> lastNames;
+    private final List<String> firstNames;
+    private final List<String> lastNames;
     private Random random;
 
     public GenerateTestData() {
         this.random = new Random();
-        firstNames = Arrays.asList("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
+        firstNames = List.of("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
                 "Mason", "Logan", "Alexander", "Ethan", "Jacob", "Michael", "Daniel", "Henry", "Jackson", "Sebastian", "Aiden", "Matthew");
-        lastNames = Arrays.asList("Smith", "Johnson", "Williams", "Jones", "Rodríguez", "Torres", "Reyes", "Ruíz",
+        lastNames = List.of("Smith", "Johnson", "Williams", "Jones", "Rodríguez", "Torres", "Reyes", "Ruíz",
                 "Aguilar", "Ortíz", "Moreno", "Chávez", "Ramos", "Herrera", "Medina", "Vargas", "Castro", "Guzmán", "Fernández", "Rojas");
     }
 
-    public List<CoursesConnection> setStudentsToCourses() {
+    public List<Course> getCourses() {
+        return List.of(new Course("Architecture", "Architecture of computer"),
+                new Course("Engineering", "Computer Engineering"),
+                new Course("History", "Computer History"),
+                new Course("Linguistics", "Second language"),
+                new Course("Philosophy", "Modern philosophy"),
+                new Course("Building", "Self-build"),
+                new Course("Sociology", "Communism and the impact to our capital countries"),
+                new Course("Law", "How not to be fired on first work place"),
+                new Course("Fashion", "How to be fashioned as programmer"),
+                new Course("Chemistry", "How to cook the meth"));
+    }
+
+    public List<CoursesConnection> getRelationshipBetweenStudentsAndCourses() {
         List<CoursesConnection> coursesConnections = new ArrayList<>();
         for (int i = 1; i <= 200; i++) {
             int amountOfCourses = random.nextInt(3) + 1;
@@ -39,28 +50,10 @@ public class GenerateTestData {
     }
 
     public List<Student> getStudents() {
-        return setStudentsToGroups(generateBunchOfStudents());
+        return setStudentsToGroups(generateStudents());
     }
 
-    private List<Student> setStudentsToGroups(Set<Student> students) {
-        List<Student> result = new ArrayList<>();
-        Queue<Student> listOfStudent = new LinkedList<>(students);
-        int amountOfStudentToAdd = random.nextInt(20) + 10;
-        for (int i = 1; i <= 10; i++) {
-            System.out.println(amountOfStudentToAdd);
-            for (int j = 0; j < amountOfStudentToAdd; j++) {
-                Student student = listOfStudent.poll();
-                if (student != null) {
-                    student.setGroupId(i);
-                    result.add(student);
-                }
-            }
-            amountOfStudentToAdd = random.nextInt(20) + 10;
-        }
-        return result;
-    }
-
-    public Set<Group> generateBunchOfNamesForGroup() {
+    public Set<Group> getGroups() {
         Set<Group> result = new HashSet<>();
         while (result.size() < 10) {
             result.add(generateGroup());
@@ -68,7 +61,25 @@ public class GenerateTestData {
         return result;
     }
 
-    public Set<Student> generateBunchOfStudents() {
+    private List<Student> setStudentsToGroups(Set<Student> students) {
+        List<Student> result = new ArrayList<>();
+        Queue<Student> studentsQueue = new LinkedList<>(students);
+        int studentAmountToAdd = random.nextInt(20) + 10;
+        for (int i = 1; i <= 10; i++) {
+            for (int j = 0; j < studentAmountToAdd; j++) {
+                Student student = studentsQueue.poll();
+                if (student != null) {
+                    student.setGroupId(i);
+                    result.add(student);
+                }
+            }
+            studentAmountToAdd = random.nextInt(20) + 10;
+        }
+        result.addAll(studentsQueue);
+        return result;
+    }
+
+    private Set<Student> generateStudents() {
         Set<Student> result = new HashSet<>();
         while (result.size() < 200) {
             result.add(generateStudent());
@@ -93,21 +104,5 @@ public class GenerateTestData {
         int randomNumber2 = random.nextInt(20);
 
         return new Student(firstNames.get(randomNumber1), lastNames.get(randomNumber2));
-    }
-
-    public static void main(String[] args) {
-        GenerateTestData generateTestData = new GenerateTestData();
-
-        /*Set<Group> namesForGroups = generateTestData.generateBunchOfNamesForGroup();
-        //namesForGroups.forEach(x -> System.out.println(x.getName()));
-
-        Set<Student> students = generateTestData.generateBunchOfStudents();
-        //students.forEach(student -> System.out.println(student.getFirstName() + " " + student.getLastName()));
-
-        List<Student> students2 = generateTestData.setStudentsToGroups(students);
-        students2.forEach(student ->  System.out.println(student.getFirstName() + " " + student.getLastName() + " " + student.getGroupId()));*/
-
-        List<CoursesConnection> test = generateTestData.setStudentsToCourses();
-        test.forEach(x -> System.out.println(x.getIdOfStudent() + " " + x.getIdOfCourse()));
     }
 }

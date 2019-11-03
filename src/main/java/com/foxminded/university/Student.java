@@ -23,6 +23,13 @@ public class Student {
         this.lastName = lastName;
     }
 
+    public Student(int id, int groupId, String firstName, String lastName) {
+        this.id = id;
+        this.groupId = groupId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
