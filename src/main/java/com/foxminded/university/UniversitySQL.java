@@ -52,7 +52,9 @@ public class UniversitySQL implements AutoCloseable {
             result = prepStatement.executeUpdate();
             try (ResultSet generatedKeys = prepStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    System.out.println(generatedKeys.getInt(1));
+                    int id = generatedKeys.getInt(1);
+                    student.setId(id);
+                    System.out.println(id);
                 }
             }
         } catch (Exception e) {
