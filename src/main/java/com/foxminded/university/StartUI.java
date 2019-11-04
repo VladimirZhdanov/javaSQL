@@ -4,15 +4,39 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
+ * Start point of the application.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 public class StartUI {
+    /**
+     * Input
+     */
     private final Input input;
+
+    /**
+     * SQL manager.
+     */
     private final UniversitySQL universitySQL;
+
+    /**
+     * Output.
+     */
     private final Consumer<String> output;
+
+    /**
+     * Flag run/stop the application.
+     */
     private boolean working;
 
+    /**
+     * Constructor of the class
+     *
+     * @param input - input
+     * @param universitySQL - SQL manager.
+     * @param output - output
+     */
     public StartUI(Input input, UniversitySQL universitySQL, Consumer<String> output) {
         this.input = input;
         this.universitySQL = universitySQL;
@@ -20,6 +44,9 @@ public class StartUI {
         working = true;
     }
 
+    /**
+     * Initialises an instance of the class
+     */
     public void init() {
         universitySQL.init();
         Menu menu = new Menu(input, output, universitySQL);
@@ -31,10 +58,18 @@ public class StartUI {
         } while (working);
     }
 
+    /**
+     * Stops the application.
+     */
     public void stop() {
         this.working = false;
     }
 
+    /**
+     * Main method to run the application.
+     *
+     * @param args - args
+     */
     public static void main(String[] args) {
         Config config = new Config();
         new StartUI(new ValidateInput(

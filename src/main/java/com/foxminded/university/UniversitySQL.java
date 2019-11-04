@@ -14,20 +14,43 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import static org.apache.ibatis.io.Resources.getResourceAsReader;
 
 /**
+ * SQL manager.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 public class UniversitySQL implements AutoCloseable {
+    /**
+     * Generated data.
+     */
     private GenerateTestData generateTestData;
+
+    /**
+     * Config.
+     */
     private final Config config;
+
+    /**
+     * Connection.
+     */
     private Connection connection;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param config - config
+     */
     public UniversitySQL(Config config) {
         generateTestData = new GenerateTestData();
         this.config = config;
         this.config.init();
     }
 
+    /**
+     * Initialises an instance of the class
+     *
+     * @return - connection != null
+     */
     public boolean init() {
         try {
             Class.forName(config.get("driver-class-name"));
@@ -42,6 +65,12 @@ public class UniversitySQL implements AutoCloseable {
         return connection != null;
     }
 
+    /**
+     * Adds student to university.
+     *
+     * @param student - student
+     * @return - added\didn't add
+     */
     public boolean add(Student student) {
         int result = 0;
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into students(first_name, last_name, group_id)"
@@ -63,6 +92,13 @@ public class UniversitySQL implements AutoCloseable {
         return result == 1;
     }
 
+    /**
+     * Adds a course to a student.
+     *
+     * @param studentId - student id
+     * @param courseId - course id
+     * @return - added\didn't add
+     */
     public boolean addStudentToCourse(int studentId, int courseId) {
         int result = 0;
         try (PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) FROM courses_connection WHERE student_id = ? AND course_id = ?;");
@@ -87,6 +123,12 @@ public class UniversitySQL implements AutoCloseable {
         return result == 1;
     }
 
+    /**
+     * Deletes a student from university by id.
+     *
+     * @param studentId - student id.
+     * @return deleted/did not
+     */
     public boolean delete(int studentId) {
         int result = 0;
         try (PreparedStatement prepStatement = connection.prepareStatement("DELETE FROM students WHERE student_id = ?;")) {
@@ -98,6 +140,13 @@ public class UniversitySQL implements AutoCloseable {
         return result == 1;
     }
 
+    /**
+     *
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     */
     public boolean removeCourse(int studentId, int courseId) {
         int result = 0;
         try (PreparedStatement prepStatement = connection.prepareStatement("DELETE FROM courses_connection WHERE student_id = ? and course_id = ?;")) {
@@ -110,24 +159,12 @@ public class UniversitySQL implements AutoCloseable {
         return result == 1;
     }
 
-    private String findAllCourses(int studentId) {
-        String result = String.format("The student with id-%d is not listed in any courses", studentId);
-        try (PreparedStatement selectStatement = connection.prepareStatement("SELECT course_id FROM courses_connection WHERE student_id = ?;")) {
-            selectStatement.setInt(1, studentId);
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                StringBuilder stringBuilder = new StringBuilder();
-                while (resultSet.next()) {
-                    stringBuilder.append(resultSet.getInt(1)).append(" ");
-                }
-                result = String.format("The student is listed in follow courses with id: %s", stringBuilder.toString());
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
+    /**
+     * Finding the student by id.
+     *
+     * @param studentId - student id
+     * @return - Student instance
+     */
     private Student findStudent(int studentId) {
         Student result = null;
         try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM students WHERE student_id = ?;")) {
@@ -147,6 +184,12 @@ public class UniversitySQL implements AutoCloseable {
         return result;
     }
 
+    /**
+     * Seeking course by ID.
+     *
+     * @param courseId - course id
+     * @return Course instance
+     */
     private Course findCourse(int courseId) {
         Course result = null;
         try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM courses WHERE course_id = ?;")) {
@@ -165,6 +208,9 @@ public class UniversitySQL implements AutoCloseable {
         return result;
     }
 
+    /**
+     * Create tables from SQL script and fills up tast data into.
+     */
     private void setTables() {
         try {
             ScriptRunner runner = new ScriptRunner(connection);
@@ -181,6 +227,9 @@ public class UniversitySQL implements AutoCloseable {
         }
     }
 
+    /**
+     * Inserts students into the student table
+     */
     private void generateStudents() {
         List<Student> students = generateTestData.getStudents();
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into students(first_name, last_name, group_id)"
@@ -197,6 +246,9 @@ public class UniversitySQL implements AutoCloseable {
         }
     }
 
+    /**
+     * Inserts groups into the group table
+     */
     private void generateGroups() {
         Set<Group> groups = generateTestData.getGroups();
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into groups(group_name)"
@@ -211,6 +263,9 @@ public class UniversitySQL implements AutoCloseable {
         }
     }
 
+    /**
+     * Inserts courses into the course table
+     */
     private void generateCourses() {
         List<Course> courses = generateTestData.getCourses();
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into courses(course_name, course_description)"
@@ -226,6 +281,9 @@ public class UniversitySQL implements AutoCloseable {
         }
     }
 
+    /**
+     * Inserts relationships between students and courses into the CourseConnections table
+     */
     private void generateCourseConnections() {
         List<CoursesConnection> coursesConnections = generateTestData.getRelationshipBetweenStudentsAndCourses();
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into courses_connection(student_id, course_id)"

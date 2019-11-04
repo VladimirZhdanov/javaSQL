@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 import static java.lang.Integer.parseInt;
 
 /**
+ * Menu od the application.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
@@ -17,17 +19,44 @@ public class Menu {
      */
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
+    /**
+     * Input.
+     */
     private Input input;
+
+    /**
+     * Output
+     */
     private final Consumer<String> output;
+
+    /**
+     * SQL manager.
+     */
     private UniversitySQL universitySQL;
+
+    /**
+     * Actions(0 - add student, 1 - remover student by id etc).
+     */
     private List<UserAction> actions = new ArrayList<>();
 
+    /**
+     * Constructor of the class.
+     *
+     * @param input - input
+     * @param output - output
+     * @param universitySQL - SQL manager
+     */
     public Menu(Input input, Consumer<String> output, UniversitySQL universitySQL) {
         this.input = input;
         this.output = output;
         this.universitySQL = universitySQL;
     }
 
+    /**
+     * Gets range of the menu(actions)
+     *
+     * @return - range of the menu(actions)
+     */
     public List<Integer> getRangeOfMenu() {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < this.actions.size(); i++) {
@@ -36,12 +65,27 @@ public class Menu {
         return result;
     }
 
+    /**
+     * Inner class to add student.
+     */
     private class AddStudent extends BaseAction {
 
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key - key of action
+         * @param name - name of the action
+         */
         public AddStudent(int key, String name) {
             super(key, name);
         }
 
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         * @param universitySQL - SQL layer(work with DB)
+         */
         @Override
         public void execute(Input input, UniversitySQL universitySQL) {
             String firstName = input.ask("Enter a first name of the student :");
@@ -51,7 +95,7 @@ public class Menu {
                 groupId = input.ask("Enter a group id for teh student :");
             }
             Student student = new Student(firstName, lastName, parseInt(groupId));
-            if(!universitySQL.add(student)) {
+            if (!universitySQL.add(student)) {
                 output.accept("The student has not been added!");
             } else {
                 System.out.printf("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR);
@@ -59,12 +103,27 @@ public class Menu {
         }
     }
 
+    /**
+     * Inner class to add course to student.
+     */
     private class AddCourseToStudent extends BaseAction {
 
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key - key of action
+         * @param name - name of the action
+         */
         public AddCourseToStudent(int key, String name) {
             super(key, name);
         }
 
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         * @param universitySQL - SQL layer(work with DB)
+         */
         @Override
         public void execute(Input input, UniversitySQL universitySQL) {
             String studentId = input.ask("Enter the student id :");
@@ -73,7 +132,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if(!universitySQL.addStudentToCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!universitySQL.addStudentToCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be added!");
             } else {
                 System.out.printf("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -81,12 +140,27 @@ public class Menu {
         }
     }
 
-    private class RemoveCourseToStudent extends BaseAction {
+    /**
+     * Inner class to remove course from student.
+     */
+    private class RemoveCourseFromStudent extends BaseAction {
 
-        public RemoveCourseToStudent(int key, String name) {
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key - key of action
+         * @param name - name of the action
+         */
+        public RemoveCourseFromStudent(int key, String name) {
             super(key, name);
         }
 
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         * @param universitySQL - SQL layer(work with DB)
+         */
         @Override
         public void execute(Input input, UniversitySQL universitySQL) {
             String studentId = input.ask("Enter the student id :");
@@ -95,7 +169,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if(!universitySQL.removeCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!universitySQL.removeCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be removed!");
             } else {
                 System.out.printf("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -103,12 +177,27 @@ public class Menu {
         }
     }
 
+    /**
+     * Inner class to remove student from university.
+     */
     private class RemoveStudent extends BaseAction {
 
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key - key of action
+         * @param name - name of the action
+         */
         public RemoveStudent(int key, String name) {
             super(key, name);
         }
 
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         * @param universitySQL - SQL layer(work with DB)
+         */
         @Override
         public void execute(Input input, UniversitySQL universitySQL) {
             String id = input.ask("Enter student id :");
@@ -123,37 +212,64 @@ public class Menu {
         }
     }
 
+    /**
+     * Inner class to exit from the program.
+     */
     private class ExitProgram extends BaseAction {
+
+        /**
+         * Start point of the application.
+         */
         private final StartUI ui;
 
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key - key of action
+         * @param name - name of the action
+         */
         public ExitProgram(StartUI ui, int key, String name) {
             super(key, name);
             this.ui = ui;
         }
 
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         * @param universitySQL - SQL layer(work with DB)
+         */
         @Override
         public void execute(Input input, UniversitySQL universitySQL) {
             this.ui.stop();
         }
-
-        @Override
-        public String info() {
-            return String.format("%s. %s", this.key(), "Exit Program");
-        }
     }
 
+    /**
+     * Fill up actions list.
+     *
+     * @param ui - Start point of the application.
+     */
     public void fillActions(StartUI ui) {
         this.actions.add(this.new AddStudent(0, "Add a new student"));
         this.actions.add(this.new RemoveStudent(1, "Remove a student from the university"));
         this.actions.add(this.new AddCourseToStudent(2, "Add a course to a student"));
-        this.actions.add(this.new RemoveCourseToStudent(3, "Remove a course from a student"));
+        this.actions.add(this.new RemoveCourseFromStudent(3, "Remove a course from a student"));
         this.actions.add(this.new ExitProgram(ui, 4, "Exit Program"));
     }
 
+    /**
+     * Executes passed action.
+     *
+     * @param key - key of the action
+     */
     public void select(int key) {
         this.actions.get(key).execute(input, universitySQL);
     }
 
+    /**
+     * Shows menu of the application.
+     */
     public void show() {
         System.out.println("Menu.");
         for (UserAction action : this.actions) {
