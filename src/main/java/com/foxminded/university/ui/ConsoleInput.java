@@ -1,5 +1,6 @@
-package com.foxminded.university;
+package com.foxminded.university.ui;
 
+import com.foxminded.university.exceptions.MenuOutException;
 import java.util.List;
 import java.util.Scanner;
 

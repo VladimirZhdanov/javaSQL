@@ -1,5 +1,7 @@
-package com.foxminded.university;
+package com.foxminded.university.ui;
 
+import com.foxminded.university.sql.Config;
+import com.foxminded.university.sql.UniversitySQL;
 import java.util.List;
 import java.util.function.Consumer;
 

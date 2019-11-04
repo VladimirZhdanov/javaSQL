@@ -1,4 +1,4 @@
-package com.foxminded.university;
+package com.foxminded.university.entities;
 
 /**
  * Class for many to many relationship between courses and students.

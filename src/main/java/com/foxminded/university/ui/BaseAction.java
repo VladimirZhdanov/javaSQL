@@ -1,4 +1,6 @@
-package com.foxminded.university;
+package com.foxminded.university.ui;
+
+import com.foxminded.university.sql.UniversitySQL;
 
 /**
  * Base implementation of user action.(Will be used as inner class for event)

@@ -1,4 +1,6 @@
-package com.foxminded.university;
+package com.foxminded.university.ui;
+
+import com.foxminded.university.sql.UniversitySQL;
 
 /**
  * Class for user action.

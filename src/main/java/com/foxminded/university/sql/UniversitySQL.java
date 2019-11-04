@@ -1,5 +1,9 @@
-package com.foxminded.university;
+package com.foxminded.university.sql;
 
+import com.foxminded.university.entities.Course;
+import com.foxminded.university.entities.CoursesConnection;
+import com.foxminded.university.entities.Group;
+import com.foxminded.university.entities.Student;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;

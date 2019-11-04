@@ -1,4 +1,4 @@
-package com.foxminded.university;
+package com.foxminded.university.entities;
 
 import java.util.Objects;
 

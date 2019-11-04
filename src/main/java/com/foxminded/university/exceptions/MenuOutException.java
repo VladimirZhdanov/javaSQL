@@ -1,4 +1,4 @@
-package com.foxminded.university;
+package com.foxminded.university.exceptions;
 
 /**
  * Custom exception for menu(when a user input number of menu that is out of range.

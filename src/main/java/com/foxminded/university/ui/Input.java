@@ -1,4 +1,4 @@
-package com.foxminded.university;
+package com.foxminded.university.ui;
 
 import java.util.List;
 

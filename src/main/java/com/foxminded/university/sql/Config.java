@@ -1,4 +1,4 @@
-package com.foxminded.university;
+package com.foxminded.university.sql;
 
 import java.io.InputStream;
 import java.util.Properties;
