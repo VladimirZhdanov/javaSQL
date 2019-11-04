@@ -231,8 +231,8 @@ public class UniversitySQL implements AutoCloseable {
         try (PreparedStatement prepStatement = connection.prepareStatement("insert into courses_connection(student_id, course_id)"
                 + " values (?, ?);", Statement.NO_GENERATED_KEYS)) {
             for (CoursesConnection coursesConnection : coursesConnections) {
-                prepStatement.setInt(1, coursesConnection.getIdOfStudent());
-                prepStatement.setInt(2, coursesConnection.getIdOfCourse());
+                prepStatement.setInt(1, coursesConnection.getStudentId());
+                prepStatement.setInt(2, coursesConnection.getCourseId());
                 prepStatement.addBatch();
             }
             prepStatement.executeBatch();

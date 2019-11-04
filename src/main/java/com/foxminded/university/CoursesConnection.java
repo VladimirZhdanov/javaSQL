@@ -1,23 +1,31 @@
 package com.foxminded.university;
 
 /**
+ * Class for many to many relationship between courses and students.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 public class CoursesConnection {
-    private int idOfStudent;
-    private int idOfCourse;
+    private int studentId;
+    private int courseId;
 
-    public CoursesConnection(int idOfStudent, int idOfCourse) {
-        this.idOfStudent = idOfStudent;
-        this.idOfCourse = idOfCourse;
+    /**
+     * Constructor of the class.
+     *
+     * @param studentId - student id
+     * @param courseId - course id
+     */
+    public CoursesConnection(int studentId, int courseId) {
+        this.studentId = studentId;
+        this.courseId = courseId;
     }
 
-    public int getIdOfStudent() {
-        return idOfStudent;
+    public int getStudentId() {
+        return studentId;
     }
 
-    public int getIdOfCourse() {
-        return idOfCourse;
+    public int getCourseId() {
+        return courseId;
     }
 }

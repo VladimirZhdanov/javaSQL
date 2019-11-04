@@ -9,14 +9,30 @@ import java.util.Random;
 import java.util.Set;
 
 /**
+ * Class for generation test data into SQL data base.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 public class GenerateTestData {
+    /**
+     * List of first names.
+     */
     private final List<String> firstNames;
+
+    /**
+     * List of last names.
+     */
     private final List<String> lastNames;
+
+    /**
+     * Random instance to generate random numbers.
+     */
     private Random random;
 
+    /**
+     * Constructor of the class.
+     */
     public GenerateTestData() {
         this.random = new Random();
         firstNames = List.of("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
@@ -25,6 +41,10 @@ public class GenerateTestData {
                 "Aguilar", "Ortíz", "Moreno", "Chávez", "Ramos", "Herrera", "Medina", "Vargas", "Castro", "Guzmán", "Fernández", "Rojas");
     }
 
+    /**
+     * Gets 10 courses.
+     * @return - 10 courses
+     */
     public List<Course> getCourses() {
         return List.of(new Course("Architecture", "Architecture of computer"),
                 new Course("Engineering", "Computer Engineering"),
@@ -38,6 +58,11 @@ public class GenerateTestData {
                 new Course("Chemistry", "How to cook the meth"));
     }
 
+    /**
+     * Assign courses(1-3 to each student) to students and get list of it: Student - Course
+     *
+     * @return - list of relationship: Student - Course
+     */
     public List<CoursesConnection> getRelationshipBetweenStudentsAndCourses() {
         List<CoursesConnection> coursesConnections = new ArrayList<>();
         for (int i = 1; i <= 200; i++) {
@@ -49,10 +74,20 @@ public class GenerateTestData {
         return coursesConnections;
     }
 
+    /**
+     * Gets 200 students with randomly assigned groups.
+     *
+     * @return - 200 students with randomly assigned groups
+     */
     public List<Student> getStudents() {
         return setStudentsToGroups(generateStudents());
     }
 
+    /**
+     * Gets 10 uniq groups.
+     *
+     * @return - 10 uniq groups
+     */
     public Set<Group> getGroups() {
         Set<Group> result = new HashSet<>();
         while (result.size() < 10) {
@@ -61,6 +96,12 @@ public class GenerateTestData {
         return result;
     }
 
+    /**
+     * Sets passed student to groups(1-10).
+     *
+     * @param students
+     * @return
+     */
     private List<Student> setStudentsToGroups(Set<Student> students) {
         List<Student> result = new ArrayList<>();
         Queue<Student> studentsQueue = new LinkedList<>(students);
