@@ -3,6 +3,8 @@ package com.foxminded.university;
 import java.util.Objects;
 
 /**
+ * Group class.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
@@ -10,10 +12,21 @@ public class Group {
     private int id;
     private String name;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param name - name
+     */
     public Group(String name) {
         this.name = name;
     }
 
+    /**
+     * Constructor of the class.
+     *
+     * @param id - id
+     * @param name - name
+     */
     public Group(int id, String name) {
         this.id = id;
         this.name = name;

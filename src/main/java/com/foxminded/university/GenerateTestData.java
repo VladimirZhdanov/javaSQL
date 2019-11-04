@@ -99,8 +99,8 @@ public class GenerateTestData {
     /**
      * Sets passed student to groups(1-10).
      *
-     * @param students
-     * @return
+     * @param students - students
+     * @return - students
      */
     private List<Student> setStudentsToGroups(Set<Student> students) {
         List<Student> result = new ArrayList<>();
@@ -120,6 +120,11 @@ public class GenerateTestData {
         return result;
     }
 
+    /**
+     * Generates 200 students.
+     *
+     * @return - 200 students
+     */
     private Set<Student> generateStudents() {
         Set<Student> result = new HashSet<>();
         while (result.size() < 200) {
@@ -128,6 +133,11 @@ public class GenerateTestData {
         return result;
     }
 
+    /**
+     * Generates a group.
+     *
+     * @return - a group
+     */
     private Group generateGroup() {
         StringBuilder result = new StringBuilder();
         int number = random.nextInt(89) + 10;
@@ -140,6 +150,11 @@ public class GenerateTestData {
         return  new Group(result.toString().toUpperCase());
     }
 
+    /**
+     * Generates a student.
+     *
+     * @return - a student
+     */
     private Student generateStudent() {
         int randomNumber1 = random.nextInt(20);
         int randomNumber2 = random.nextInt(20);

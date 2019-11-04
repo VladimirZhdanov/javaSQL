@@ -3,6 +3,8 @@ package com.foxminded.university;
 import java.util.Objects;
 
 /**
+ * Student class.
+ *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
@@ -12,17 +14,38 @@ public class Student {
     private String firstName;
     private String lastName;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param firstName - first name
+     * @param lastName - last name
+     */
+    public Student(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    /**
+     * Constructor of the class.
+     *
+     * @param firstName - first name
+     * @param lastName - last name
+     * @param groupId - group id
+     */
     public Student(String firstName, String lastName, int groupId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.groupId = groupId;
     }
 
-    public Student(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
+    /**
+     * Constructor of the class.
+     *
+     * @param id - id
+     * @param groupId - group id
+     * @param firstName - first name
+     * @param lastName - last name
+     */
     public Student(int id, int groupId, String firstName, String lastName) {
         this.id = id;
         this.groupId = groupId;
