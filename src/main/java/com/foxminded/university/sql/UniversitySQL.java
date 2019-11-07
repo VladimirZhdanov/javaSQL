@@ -45,9 +45,12 @@ public class UniversitySQL implements AutoCloseable {
      * @param config - config
      */
     public UniversitySQL(Config config) {
+        if (config == null) {
+            throw new IllegalArgumentException("Null was passed to the method...");
+        }
         generateTestData = new GenerateTestData();
         this.config = config;
-        this.config.init();
+        //this.config.init();
     }
 
     /**
@@ -65,7 +68,7 @@ public class UniversitySQL implements AutoCloseable {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        setTables();
+        //setTables();
         return connection != null;
     }
 
@@ -215,7 +218,7 @@ public class UniversitySQL implements AutoCloseable {
     /**
      * Create tables from SQL script and fills up tast data into.
      */
-    private void setTables() {
+    public void setTables() {
         try {
             ScriptRunner runner = new ScriptRunner(connection);
             runner.setAutoCommit(true);
@@ -308,5 +311,9 @@ public class UniversitySQL implements AutoCloseable {
         if (connection != null) {
             connection.close();
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }

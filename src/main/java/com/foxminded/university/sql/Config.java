@@ -1,5 +1,7 @@
 package com.foxminded.university.sql;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -11,22 +13,30 @@ import java.util.Properties;
  * @since 0.1
  */
 public class Config {
-    private final Properties values;
+    private final Properties properties;
 
     /**
      * Constructor of the class.
      */
     public Config() {
-        values = new Properties();
+        properties = new Properties();
+        init();
+    }
+
+    /**
+     * Constructor of the class.
+     */
+    public Config(Properties properties) {
+        this.properties = properties;
     }
 
     /**
      * Initialisation.
      */
-    public void init() {
+    private void init() {
         try (InputStream in = Config.class.getClassLoader().getResourceAsStream("app.properties")) {
             assert in != null;
-            values.load(in);
+            properties.load(in);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -39,6 +49,6 @@ public class Config {
      * @return - property - String
      */
     public String get(String key) {
-        return this.values.getProperty(key);
+        return this.properties.getProperty(key);
     }
 }

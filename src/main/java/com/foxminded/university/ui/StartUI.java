@@ -51,6 +51,7 @@ public class StartUI {
      */
     public void init() {
         universitySQL.init();
+        universitySQL.setTables();
         Menu menu = new Menu(input, output, universitySQL);
         menu.fillActions(this);
         List<Integer> range = menu.getRangeOfMenu();
