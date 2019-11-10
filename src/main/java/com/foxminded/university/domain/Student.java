@@ -1,4 +1,4 @@
-package com.foxminded.university.entities;
+package com.foxminded.university.domain;
 
 import java.util.Objects;
 
@@ -53,12 +53,23 @@ public class Student {
         this.lastName = lastName;
     }
 
+    public Student() {
+    }
+
     public void setId(int id) {
         this.id = id;
     }
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public int getId() {
@@ -94,5 +105,15 @@ public class Student {
     @Override
     public int hashCode() {
         return Objects.hash(id, firstName, lastName);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{"
+                + "id=" + id
+                + ", groupId=" + groupId
+                + ", firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
+                + '}';
     }
 }

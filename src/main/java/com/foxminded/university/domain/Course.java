@@ -1,24 +1,25 @@
-package com.foxminded.university.entities;
-
-import java.util.Objects;
+package com.foxminded.university.domain;
 
 /**
- * Group class.
+ * Course class.
  *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
-public class Group {
+public class Course {
     private int id;
     private String name;
+    private String description;
 
     /**
      * Constructor of the class.
      *
      * @param name - name
+     * @param description - description
      */
-    public Group(String name) {
+    public Course(String name, String description) {
         this.name = name;
+        this.description = description;
     }
 
     /**
@@ -26,10 +27,12 @@ public class Group {
      *
      * @param id - id
      * @param name - name
+     * @param description - description
      */
-    public Group(int id, String name) {
+    public Course(int id, String name, String description) {
         this.id = id;
         this.name = name;
+        this.description = description;
     }
 
     public void setId(int id) {
@@ -44,20 +47,7 @@ public class Group {
         return name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Group group = (Group) o;
-        return id == group.id && Objects.equals(name, group.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
+    public String getDescription() {
+        return description;
     }
 }

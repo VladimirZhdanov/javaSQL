@@ -1,7 +1,10 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.sql.UniversitySQL;
-import com.foxminded.university.entities.Student;
+import com.foxminded.university.dao.CoursesConnectionSQL;
+import com.foxminded.university.dao.GroupSQL;
+import com.foxminded.university.dao.StudentSQL;
+import com.foxminded.university.domain.Group;
+import com.foxminded.university.domain.Student;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,10 +34,9 @@ public class Menu {
      */
     private final Consumer<String> output;
 
-    /**
-     * SQL manager.
-     */
-    private UniversitySQL universitySQL;
+    private StudentSQL studentSQL;
+    private GroupSQL groupSQL;
+    private CoursesConnectionSQL coursesConnectionSQL;
 
     /**
      * Actions(0 - add student, 1 - remover student by id etc).
@@ -46,12 +48,13 @@ public class Menu {
      *
      * @param input - input
      * @param output - output
-     * @param universitySQL - SQL manager
      */
-    public Menu(Input input, Consumer<String> output, UniversitySQL universitySQL) {
+    public Menu(Input input, Consumer<String> output, GroupSQL groupSQL, StudentSQL studentSQL, CoursesConnectionSQL coursesConnectionSQL) {
         this.input = input;
         this.output = output;
-        this.universitySQL = universitySQL;
+        this.groupSQL = groupSQL;
+        this.studentSQL = studentSQL;
+        this.coursesConnectionSQL = coursesConnectionSQL;
     }
 
     /**
@@ -86,10 +89,9 @@ public class Menu {
          * Executes passed action.
          *
          * @param input - input
-         * @param universitySQL - SQL layer(work with DB)
          */
         @Override
-        public void execute(Input input, UniversitySQL universitySQL) {
+        public void execute(Input input) {
             String firstName = input.ask("Enter a first name of the student :");
             String lastName = input.ask("Enter a last name of the student :");
             String groupId = input.ask("Enter a group id for the student :");
@@ -97,7 +99,7 @@ public class Menu {
                 groupId = input.ask("Enter a group id for teh student :");
             }
             Student student = new Student(firstName, lastName, parseInt(groupId));
-            if (!universitySQL.add(student)) {
+            if (!studentSQL.insertStudent(student)) {
                 output.accept("The student has not been added!");
             } else {
                 System.out.printf("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR);
@@ -124,17 +126,16 @@ public class Menu {
          * Executes passed action.
          *
          * @param input - input
-         * @param universitySQL - SQL layer(work with DB)
          */
         @Override
-        public void execute(Input input, UniversitySQL universitySQL) {
+        public void execute(Input input) {
             String studentId = input.ask("Enter the student id :");
             String courseId = input.ask("Enter a course id :");
             while (!(studentId.matches("[0-9]+") && courseId.matches("[0-9]+"))) {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!universitySQL.addStudentToCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!coursesConnectionSQL.addCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be added!");
             } else {
                 System.out.printf("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -161,20 +162,86 @@ public class Menu {
          * Executes passed action.
          *
          * @param input - input
-         * @param universitySQL - SQL layer(work with DB)
          */
         @Override
-        public void execute(Input input, UniversitySQL universitySQL) {
+        public void execute(Input input) {
             String studentId = input.ask("Enter the student id :");
             String courseId = input.ask("Enter a course id :");
             while (!(studentId.matches("[0-9]+") && courseId.matches("[0-9]+"))) {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!universitySQL.removeCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!coursesConnectionSQL.removeCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be removed!");
             } else {
                 System.out.printf("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
+            }
+        }
+    }
+
+    /**
+     * Inner class to find all groups with less or equals student count.
+     */
+    private class FindGroups extends BaseAction {
+
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key  - key of action
+         * @param name - name of the action
+         */
+        public FindGroups(int key, String name) {
+            super(key, name);
+        }
+
+        /**
+         * Executes passed action.
+         *
+         * @param input - input
+         */
+        @Override
+        public void execute(Input input) {
+            String amountStudents = input.ask("Enter student amount :");
+            while (!amountStudents.matches("[0-9]+")) {
+                amountStudents = input.ask("Enter student amount :");
+            }
+            List<Group> groups = groupSQL.findGroups(parseInt(amountStudents));
+            if (groups.size() == 0) {
+                System.out.println("Groups have not found.");
+            } else {
+                groups.forEach(System.out::println);
+            }
+        }
+    }
+
+    /**
+     * Inner class to find all students related to course with given name.
+     */
+    private class FindStudents extends BaseAction {
+
+        /**
+         * Constructor of the inner class.
+         *
+         * @param key  - key of action
+         * @param name - name of the action
+         */
+        public FindStudents(int key, String name) {
+            super(key, name);
+        }
+
+        /**
+         * Executes passed action.
+         *
+         * @param input         - input
+         */
+        @Override
+        public void execute(Input input) {
+            String courseName = input.ask("Enter course name :");
+            List<Student> students = studentSQL.findStudents(courseName);
+            if (students.size() == 0) {
+                System.out.println("Students have not found.");
+            } else {
+                students.forEach(System.out::println);
             }
         }
     }
@@ -198,21 +265,21 @@ public class Menu {
          * Executes passed action.
          *
          * @param input - input
-         * @param universitySQL - SQL layer(work with DB)
          */
         @Override
-        public void execute(Input input, UniversitySQL universitySQL) {
+        public void execute(Input input) {
             String id = input.ask("Enter student id :");
             while (!id.matches("[0-9]+")) {
                 id = input.ask("Enter student id :");
             }
-            if (!universitySQL.delete(parseInt(id))) {
+            if (!studentSQL.deleteStudent(parseInt(id))) {
                 output.accept("The id is not exist!");
             } else {
                 output.accept(String.format("------------ The student (id: %s) is not longer in our university -----------", id));
             }
         }
     }
+
 
     /**
      * Inner class to exit from the program.
@@ -239,10 +306,9 @@ public class Menu {
          * Executes passed action.
          *
          * @param input - input
-         * @param universitySQL - SQL layer(work with DB)
          */
         @Override
-        public void execute(Input input, UniversitySQL universitySQL) {
+        public void execute(Input input) {
             this.ui.stop();
         }
     }
@@ -253,11 +319,13 @@ public class Menu {
      * @param ui - Start point of the application.
      */
     public void fillActions(StartUI ui) {
-        this.actions.add(this.new AddStudent(0, "Add a new student"));
-        this.actions.add(this.new RemoveStudent(1, "Remove a student from the university"));
-        this.actions.add(this.new AddCourseToStudent(2, "Add a course to a student"));
-        this.actions.add(this.new RemoveCourseFromStudent(3, "Remove a course from a student"));
-        this.actions.add(this.new ExitProgram(ui, 4, "Exit Program"));
+        this.actions.add(this.new FindGroups(0, "Find all groups with less or equals student count"));
+        this.actions.add(this.new FindStudents(1, "Find all students related to course with given name"));
+        this.actions.add(this.new AddStudent(2, "Add new student"));
+        this.actions.add(this.new RemoveStudent(3, "Delete student by STUDENT_ID"));
+        this.actions.add(this.new AddCourseToStudent(4, "Add a student to the course (from a list)"));
+        this.actions.add(this.new RemoveCourseFromStudent(5, "Remove the student from one of his or her courses"));
+        this.actions.add(this.new ExitProgram(ui, 6, "Exit Program"));
     }
 
     /**
@@ -266,7 +334,7 @@ public class Menu {
      * @param key - key of the action
      */
     public void select(int key) {
-        this.actions.get(key).execute(input, universitySQL);
+        this.actions.get(key).execute(input);
     }
 
     /**

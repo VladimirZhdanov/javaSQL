@@ -1,6 +1,6 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.sql.UniversitySQL;
+import com.foxminded.university.dao.UniversitySQL;
 
 /**
  * Class for user action.
@@ -21,9 +21,8 @@ public interface UserAction {
      * Executes passed action.
      *
      * @param input - input
-     * @param universitySQL - SQL layer(work with DB)
      */
-    void execute(Input input, UniversitySQL universitySQL);
+    void execute(Input input);
 
     /**
      * Gets information of the action.

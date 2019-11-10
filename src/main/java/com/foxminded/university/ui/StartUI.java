@@ -1,7 +1,12 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.sql.Config;
-import com.foxminded.university.sql.UniversitySQL;
+import com.foxminded.university.dao.CoursesConnectionSQL;
+import com.foxminded.university.dao.GroupSQL;
+import com.foxminded.university.dao.StudentSQL;
+import com.foxminded.university.dao.connection.Config;
+import com.foxminded.university.dao.UniversitySQL;
+import com.foxminded.university.dao.connection.DataSource;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -12,15 +17,30 @@ import java.util.function.Consumer;
  * @since 0.1
  */
 public class StartUI {
+    private static final String POSTGRES_PROPERTIES = "postgres.properties";
+    private static final String UNIVERSITY_PROPERTIES = "university.properties";
+    private Config configPostgres;
+    private Config configUniversity;
+
+    /**
+     * Connection pool and connection fabric (postgres).
+     */
+    private DataSource dataSourcePostgres;
+
+    /**
+     * Connection pool and connection fabric (university).
+     */
+    private DataSource dataSourceUniversity;
+
     /**
      * Input
      */
     private final Input input;
 
-    /**
-     * SQL manager.
-     */
     private final UniversitySQL universitySQL;
+    private StudentSQL studentSQL;
+    private GroupSQL groupSQL;
+    private CoursesConnectionSQL coursesConnectionSQL;
 
     /**
      * Output.
@@ -36,12 +56,24 @@ public class StartUI {
      * Constructor of the class
      *
      * @param input - input
-     * @param universitySQL - SQL manager.
      * @param output - output
      */
-    public StartUI(Input input, UniversitySQL universitySQL, Consumer<String> output) {
+    public StartUI(Input input, Consumer<String> output) {
+        configPostgres = new Config();
+        configUniversity = new Config();
+        try {
+            configPostgres.loadProperties(POSTGRES_PROPERTIES);
+            configUniversity.loadProperties(UNIVERSITY_PROPERTIES);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.dataSourcePostgres = new DataSource(configPostgres);
+        this.dataSourceUniversity = new DataSource(configUniversity);
+        this.universitySQL = new UniversitySQL(dataSourcePostgres, dataSourceUniversity);
+        this.groupSQL = new GroupSQL(dataSourceUniversity);
+        this.studentSQL = new StudentSQL(dataSourceUniversity);
+        this.coursesConnectionSQL = new CoursesConnectionSQL(dataSourceUniversity);
         this.input = input;
-        this.universitySQL = universitySQL;
         this.output = output;
         working = true;
     }
@@ -50,9 +82,8 @@ public class StartUI {
      * Initialises an instance of the class
      */
     public void init() {
-        universitySQL.init();
-        universitySQL.setTables();
-        Menu menu = new Menu(input, output, universitySQL);
+        universitySQL.setDateBase();
+        Menu menu = new Menu(input, output, groupSQL, studentSQL, coursesConnectionSQL);
         menu.fillActions(this);
         List<Integer> range = menu.getRangeOfMenu();
         do {
@@ -65,6 +96,7 @@ public class StartUI {
      * Stops the application.
      */
     public void stop() {
+        universitySQL.dropDataBase();
         this.working = false;
     }
 
@@ -74,9 +106,7 @@ public class StartUI {
      * @param args - args
      */
     public static void main(String[] args) {
-        Config config = new Config();
         new StartUI(new ValidateInput(
-                new ConsoleInput()
-        ), new UniversitySQL(config), System.out::println).init();
+                new ConsoleInput()), System.out::println).init();
     }
 }

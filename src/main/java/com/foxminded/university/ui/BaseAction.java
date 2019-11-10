@@ -1,7 +1,5 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.sql.UniversitySQL;
-
 /**
  * Base implementation of user action.(Will be used as inner class for event)
  *
@@ -37,10 +35,9 @@ public class BaseAction implements UserAction {
      * Executes passed action.
      *
      * @param input - input
-     * @param universitySQL - SQL layer(work with DB)
      */
     @Override
-    public void execute(Input input, UniversitySQL universitySQL) {
+    public void execute(Input input) {
 
     }
 

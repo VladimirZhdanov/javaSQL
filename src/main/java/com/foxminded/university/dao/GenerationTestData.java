@@ -1,10 +1,12 @@
-package com.foxminded.university.sql;
+package com.foxminded.university.dao;
 
-import com.foxminded.university.entities.Course;
-import com.foxminded.university.entities.CoursesConnection;
-import com.foxminded.university.entities.Group;
-import com.foxminded.university.entities.Student;
+import com.foxminded.university.domain.Course;
+import com.foxminded.university.domain.CoursesConnection;
+import com.foxminded.university.domain.Group;
+import com.foxminded.university.domain.Student;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,13 +14,16 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
+import static java.util.Collections.shuffle;
+import static java.util.List.of;
+
 /**
  * Class for generation test data into SQL data base.
  *
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
-public class GenerateTestData {
+public class GenerationTestData {
     /**
      * List of first names.
      */
@@ -37,11 +42,11 @@ public class GenerateTestData {
     /**
      * Constructor of the class.
      */
-    public GenerateTestData() {
+    public GenerationTestData() {
         this.random = new Random();
-        firstNames = List.of("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
+        firstNames = of("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
                 "Mason", "Logan", "Alexander", "Ethan", "Jacob", "Michael", "Daniel", "Henry", "Jackson", "Sebastian", "Aiden", "Matthew");
-        lastNames = List.of("Smith", "Johnson", "Williams", "Jones", "Rodríguez", "Torres", "Reyes", "Ruíz",
+        lastNames = of("Smith", "Johnson", "Williams", "Jones", "Rodríguez", "Torres", "Reyes", "Ruíz",
                 "Aguilar", "Ortíz", "Moreno", "Chávez", "Ramos", "Herrera", "Medina", "Vargas", "Castro", "Guzmán", "Fernández", "Rojas");
     }
 
@@ -50,7 +55,7 @@ public class GenerateTestData {
      * @return - 10 courses
      */
     public List<Course> getCourses() {
-        return List.of(new Course("Architecture", "Architecture of computer"),
+        return of(new Course("Architecture", "Architecture of computer"),
                 new Course("Engineering", "Computer Engineering"),
                 new Course("History", "Computer History"),
                 new Course("Linguistics", "Second language"),
@@ -71,11 +76,23 @@ public class GenerateTestData {
         List<CoursesConnection> coursesConnections = new ArrayList<>();
         for (int i = 1; i <= 200; i++) {
             int amountOfCourses = random.nextInt(3) + 1;
+            List<Integer> list = randomTen();
             for (int j = 0; j < amountOfCourses; j++) {
-                coursesConnections.add(new CoursesConnection(i, random.nextInt(10) + 1));
+                coursesConnections.add(new CoursesConnection(i, list.get(j)));
             }
         }
         return coursesConnections;
+    }
+
+    /**
+     * Gets shuffled list of 10
+     *
+     * @return - shuffled list of 10
+     */
+    private List<Integer> randomTen() {
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        shuffle(list);
+        return list;
     }
 
     /**

@@ -1,7 +1,8 @@
-package com.foxminded.university.sql;
+package com.foxminded.university.dao.connection;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -16,10 +17,9 @@ public class Config {
     private String url;
     private String user;
     private String password;
-
     private String driverName;
 
-    private static final String PROPERTIES_NAME = "config.properties";
+    private static final String PROPERTIES_PATH = "postgres.properties";
 
     /**
      * Load properties.
@@ -27,7 +27,7 @@ public class Config {
      * @throws IOException - constructs an IOException with the specified detail message
      */
     public void loadProperties() throws IOException {
-        loadProperties(PROPERTIES_NAME);
+        loadProperties(PROPERTIES_PATH);
     }
 
     /**
@@ -40,7 +40,12 @@ public class Config {
         if (fileName == null) {
             throw new IllegalArgumentException("Null was passed to the method...");
         }
-        try (FileInputStream fis = new FileInputStream(fileName)) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(fileName);
+        if (resource == null) {
+            throw new IllegalArgumentException("file is not found!");
+        }
+        try (FileInputStream fis = new FileInputStream(resource.getFile())) {
             Properties properties = new Properties();
             properties.load(fis);
             loadProperties(properties);
@@ -121,9 +126,9 @@ public class Config {
 
     /**
      * Properties.
-    private final Properties properties;
+     private final Properties properties;
 
-    *//**
+     *//**
      * Constructor of the class.
      *//*
     public Config() {
@@ -142,7 +147,7 @@ public class Config {
      * Initialisation.
      *//*
     private void init() {
-        try (InputStream in = Config.class.getClassLoader().getResourceAsStream("app.properties")) {
+        try (InputStream in = Config.class.getClassLoader().getResourceAsStream("postgres.properties")) {
             assert in != null;
             properties.load(in);
         } catch (Exception e) {

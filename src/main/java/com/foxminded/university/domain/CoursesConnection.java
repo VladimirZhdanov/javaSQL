@@ -1,4 +1,4 @@
-package com.foxminded.university.entities;
+package com.foxminded.university.domain;
 
 /**
  * Class for many to many relationship between courses and students.
@@ -27,5 +27,10 @@ public class CoursesConnection {
 
     public int getCourseId() {
         return courseId;
+    }
+
+    @Override
+    public String toString() {
+        return "CoursesConnection{" + "studentId=" + studentId + ", courseId=" + courseId + '}';
     }
 }
