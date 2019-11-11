@@ -1,11 +1,10 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.dao.connection.Config;
 import com.foxminded.university.dao.connection.DataSource;
-import com.foxminded.university.domain.Course;
+import com.foxminded.university.dao.layers.CourseDAO;
+import com.foxminded.university.dao.layers.GroupDAO;
+import com.foxminded.university.dao.layers.StudentDAO;
 import com.foxminded.university.domain.CoursesConnection;
-import com.foxminded.university.domain.Group;
-import com.foxminded.university.domain.Student;
 import com.foxminded.university.exceptions.DAOException;
 import java.io.IOException;
 import java.sql.Connection;
@@ -13,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Set;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import static org.apache.ibatis.io.Resources.getResourceAsReader;
@@ -29,6 +27,9 @@ public class UniversitySQL {
     private static final String CREATE_DB = "dataBaseCreation.SQL";
     private static final String CREATE_TABLES = "tablesCreation.SQL";
 
+    CourseDAO courseDAO;
+    StudentDAO studentDAO;
+    GroupDAO groupDAO;
     /**
      * Generated data.
      */
@@ -57,6 +58,9 @@ public class UniversitySQL {
         generationTestData = new GenerationTestData();
         this.dataSourcePostgres = dataSourcePostgres;
         this.dataSourceUniversity = dataSourceUniversity;
+        courseDAO = new CourseSQL(dataSourceUniversity);
+        groupDAO = new GroupSQL(dataSourceUniversity);
+        studentDAO = new StudentSQL(dataSourceUniversity);
     }
 
     /**
@@ -66,9 +70,9 @@ public class UniversitySQL {
         executeQuery(dataSourcePostgres, DROP_DB);
         executeQuery(dataSourcePostgres, CREATE_DB);
         executeQuery(dataSourceUniversity, CREATE_TABLES);
-        insertStudents();
-        insertGroups();
-        insertCourses();
+        studentDAO.insertStudents(generationTestData.getStudents());
+        groupDAO.insertGroups(generationTestData.getGroups());
+        courseDAO.insertCourses(generationTestData.getCourses());
         insertCourseConnections();
     }
 
@@ -78,63 +82,6 @@ public class UniversitySQL {
     public void dropDataBase() {
         dataSourceUniversity.closeConnection();
         executeQuery(dataSourcePostgres, DROP_DB);
-    }
-
-    /**
-     * Inserts students into the student table
-     */
-    private void insertStudents() {
-        List<Student> students = generationTestData.getStudents();
-        try (Connection connection = dataSourceUniversity.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into students(first_name, last_name, group_id)"
-                     + " values (?, ?, ?);", Statement.NO_GENERATED_KEYS)) {
-            for (Student student : students) {
-                prepStatement.setString(1, student.getFirstName());
-                prepStatement.setString(2, student.getLastName());
-                prepStatement.setInt(3, student.getGroupId());
-                prepStatement.addBatch();
-            }
-            prepStatement.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Inserts groups into the group table
-     */
-    private void insertGroups() {
-        Set<Group> groups = generationTestData.getGroups();
-        try (Connection connection = dataSourceUniversity.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into groups(group_name)"
-                     + " values (?);", Statement.NO_GENERATED_KEYS)) {
-            for (Group group : groups) {
-                prepStatement.setString(1, group.getName());
-                prepStatement.addBatch();
-            }
-            prepStatement.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Inserts courses into the course table
-     */
-    private void insertCourses() {
-        List<Course> courses = generationTestData.getCourses();
-        try (Connection connection = dataSourceUniversity.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into courses(course_name, course_description)"
-                     + " values (?, ?);", Statement.NO_GENERATED_KEYS)) {
-            for (Course course : courses) {
-                prepStatement.setString(1, course.getName());
-                prepStatement.setString(2, course.getDescription());
-                prepStatement.addBatch();
-            }
-            prepStatement.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

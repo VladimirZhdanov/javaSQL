@@ -13,6 +13,12 @@ public class Course {
 
     /**
      * Constructor of the class.
+     */
+    public Course() {
+    }
+
+    /**
+     * Constructor of the class.
      *
      * @param name - name
      * @param description - description
@@ -37,6 +43,14 @@ public class Course {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getId() {

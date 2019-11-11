@@ -7,8 +7,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * DAO layer for the groups table.
@@ -59,6 +61,26 @@ public class GroupSQL implements GroupDAO {
             e.printStackTrace();
         }
         return students;
+    }
+
+    /**
+     * Inserts passed groups.
+     *
+     * @param groups - groups
+     */
+    @Override
+    public void insertGroups(Set<Group> groups) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement prepStatement = connection.prepareStatement("insert into groups(group_name)"
+                     + " values (?);", Statement.NO_GENERATED_KEYS)) {
+            for (Group group : groups) {
+                prepStatement.setString(1, group.getName());
+                prepStatement.addBatch();
+            }
+            prepStatement.executeBatch();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

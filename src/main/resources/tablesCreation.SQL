@@ -16,6 +16,6 @@ course_description text);
 CREATE table if not exists courses_connection (
 student_id int NOT NULL,
 course_id int NOT NULL,
-FOREIGN KEY (student_id) REFERENCES students(student_id),
-FOREIGN KEY (course_id) REFERENCES courses(course_id),
+FOREIGN KEY (student_id) REFERENCES students(student_id) ON UPDATE CASCADE ON DELETE CASCADE,
+FOREIGN KEY (course_id) REFERENCES courses(course_id) ON UPDATE CASCADE ON DELETE CASCADE,
 UNIQUE (student_id, course_id));

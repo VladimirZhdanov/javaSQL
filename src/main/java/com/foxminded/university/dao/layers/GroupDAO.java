@@ -2,6 +2,7 @@ package com.foxminded.university.dao.layers;
 
 import com.foxminded.university.domain.Group;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Group DAO
@@ -18,4 +19,11 @@ public interface GroupDAO {
      * @return - list of groups
      */
     List<Group> findGroups(int amountStudents);
+
+    /**
+     * Inserts passed groups.
+     *
+     * @param groups - groups
+     */
+    void insertGroups(Set<Group> groups);
 }

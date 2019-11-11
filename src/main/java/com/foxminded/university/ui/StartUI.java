@@ -1,6 +1,6 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.dao.CoursesConnectionSQL;
+import com.foxminded.university.dao.CourseSQL;
 import com.foxminded.university.dao.GroupSQL;
 import com.foxminded.university.dao.StudentSQL;
 import com.foxminded.university.dao.connection.Config;
@@ -38,9 +38,9 @@ public class StartUI {
     private final Input input;
 
     private final UniversitySQL universitySQL;
-    private StudentSQL studentSQL;
-    private GroupSQL groupSQL;
-    private CoursesConnectionSQL coursesConnectionSQL;
+    private StudentSQL studentDAO;
+    private GroupSQL groupDAO;
+    private CourseSQL courseDAO;
 
     /**
      * Output.
@@ -70,9 +70,9 @@ public class StartUI {
         this.dataSourcePostgres = new DataSource(configPostgres);
         this.dataSourceUniversity = new DataSource(configUniversity);
         this.universitySQL = new UniversitySQL(dataSourcePostgres, dataSourceUniversity);
-        this.groupSQL = new GroupSQL(dataSourceUniversity);
-        this.studentSQL = new StudentSQL(dataSourceUniversity);
-        this.coursesConnectionSQL = new CoursesConnectionSQL(dataSourceUniversity);
+        this.groupDAO = new GroupSQL(dataSourceUniversity);
+        this.studentDAO = new StudentSQL(dataSourceUniversity);
+        this.courseDAO = new CourseSQL(dataSourceUniversity);
         this.input = input;
         this.output = output;
         working = true;
@@ -83,7 +83,7 @@ public class StartUI {
      */
     public void init() {
         universitySQL.setDateBase();
-        Menu menu = new Menu(input, output, groupSQL, studentSQL, coursesConnectionSQL);
+        Menu menu = new Menu(input, output, groupDAO, studentDAO, courseDAO);
         menu.fillActions(this);
         List<Integer> range = menu.getRangeOfMenu();
         do {

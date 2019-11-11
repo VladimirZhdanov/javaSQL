@@ -1,8 +1,11 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.dao.CoursesConnectionSQL;
+import com.foxminded.university.dao.CourseSQL;
 import com.foxminded.university.dao.GroupSQL;
 import com.foxminded.university.dao.StudentSQL;
+import com.foxminded.university.dao.layers.CourseDAO;
+import com.foxminded.university.dao.layers.GroupDAO;
+import com.foxminded.university.dao.layers.StudentDAO;
 import com.foxminded.university.domain.Group;
 import com.foxminded.university.domain.Student;
 import java.util.ArrayList;
@@ -34,9 +37,9 @@ public class Menu {
      */
     private final Consumer<String> output;
 
-    private StudentSQL studentSQL;
-    private GroupSQL groupSQL;
-    private CoursesConnectionSQL coursesConnectionSQL;
+    private StudentDAO studentDAO;
+    private GroupDAO groupDAO;
+    private CourseDAO courseDAO;
 
     /**
      * Actions(0 - add student, 1 - remover student by id etc).
@@ -49,12 +52,12 @@ public class Menu {
      * @param input - input
      * @param output - output
      */
-    public Menu(Input input, Consumer<String> output, GroupSQL groupSQL, StudentSQL studentSQL, CoursesConnectionSQL coursesConnectionSQL) {
+    public Menu(Input input, Consumer<String> output, GroupDAO groupDAO, StudentDAO studentDAO, CourseDAO courseDAO) {
         this.input = input;
         this.output = output;
-        this.groupSQL = groupSQL;
-        this.studentSQL = studentSQL;
-        this.coursesConnectionSQL = coursesConnectionSQL;
+        this.groupDAO = groupDAO;
+        this.studentDAO = studentDAO;
+        this.courseDAO = courseDAO;
     }
 
     /**
@@ -99,7 +102,7 @@ public class Menu {
                 groupId = input.ask("Enter a group id for teh student :");
             }
             Student student = new Student(firstName, lastName, parseInt(groupId));
-            if (!studentSQL.insertStudent(student)) {
+            if (!studentDAO.insertStudent(student)) {
                 output.accept("The student has not been added!");
             } else {
                 System.out.printf("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR);
@@ -135,7 +138,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!coursesConnectionSQL.addCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!studentDAO.addCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be added!");
             } else {
                 System.out.printf("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -171,7 +174,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!coursesConnectionSQL.removeCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!courseDAO.removeCourse(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be removed!");
             } else {
                 System.out.printf("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -205,7 +208,7 @@ public class Menu {
             while (!amountStudents.matches("[0-9]+")) {
                 amountStudents = input.ask("Enter student amount :");
             }
-            List<Group> groups = groupSQL.findGroups(parseInt(amountStudents));
+            List<Group> groups = groupDAO.findGroups(parseInt(amountStudents));
             if (groups.size() == 0) {
                 System.out.println("Groups have not found.");
             } else {
@@ -237,7 +240,7 @@ public class Menu {
         @Override
         public void execute(Input input) {
             String courseName = input.ask("Enter course name :");
-            List<Student> students = studentSQL.findStudents(courseName);
+            List<Student> students = studentDAO.findStudents(courseName);
             if (students.size() == 0) {
                 System.out.println("Students have not found.");
             } else {
@@ -272,7 +275,7 @@ public class Menu {
             while (!id.matches("[0-9]+")) {
                 id = input.ask("Enter student id :");
             }
-            if (!studentSQL.deleteStudent(parseInt(id))) {
+            if (!studentDAO.deleteStudent(parseInt(id))) {
                 output.accept("The id is not exist!");
             } else {
                 output.accept(String.format("------------ The student (id: %s) is not longer in our university -----------", id));
