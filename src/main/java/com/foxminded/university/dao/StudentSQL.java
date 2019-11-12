@@ -241,13 +241,14 @@ public class StudentSQL implements StudentDAO {
     /**
      * Inserts relationship: Student - Course.
      *
-     * @param studentToCourses - relationship: Student - Course
+     * @param studentsWithCourses - students with relationship: Student - Course
      */
     @Override
-    public void insertStudentsToCourses(Map<Student, List<Course>> studentToCourses) {
+    public void insertStudentsToCourses(List<Student> studentsWithCourses) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), Statement.NO_GENERATED_KEYS)) {
-            studentToCourses.forEach((student, courses) -> {
+            studentsWithCourses.forEach(student -> {
+                List<Course> courses = student.getCourses();
                 courses.forEach(course -> {
                     try {
                         statement.setInt(1, student.getId());

@@ -64,10 +64,9 @@ public class GenerationTestData {
      *
      * @param students - students
      * @param courses - courses
-     * @return - Relationship Between Students And Courses
+     * @return - students with Relationship Between Students And Courses
      */
-    public Map<Student, List<Course>> getCoursesConnectionToStudent(List<Student> students, List<Course> courses) {
-        Map<Student, List<Course>> result = new HashMap<>();
+    public List<Student> getCoursesConnectionToStudent(List<Student> students, List<Course> courses) {
         for (Student student : students) {
             int amountOfCourses = random.nextInt(3) + 1;
             List<Course> courseTemp = new ArrayList<>(courses);
@@ -77,9 +76,9 @@ public class GenerationTestData {
                 Course studentCourse = courseTemp.get(i);
                 studentCourses.add(studentCourse);
             }
-            result.put(student, studentCourses);
+            student.setCourses(studentCourses);
         }
-        return result;
+        return students;
     }
 
     /**

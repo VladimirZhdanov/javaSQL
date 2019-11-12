@@ -54,9 +54,9 @@ public interface StudentDAO {
     /**
      * Inserts relationship: Student - Course.
      *
-     * @param studentToCourses - relationship: Student - Course
+     * @param studentsWithCourses - students with relationship: Student - Course
      */
-    void insertStudentsToCourses(Map<Student, List<Course>> studentToCourses);
+    void insertStudentsToCourses(List<Student> studentsWithCourses);
 
     /**
      * Adds a course to a student.

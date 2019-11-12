@@ -85,10 +85,10 @@ public class UniversitySQL {
         //get students and courses with id and generate relationship between students and courses
         students = studentDAO.getAllStudents();
         courses = courseDAO.getAllCourses();
-        Map<Student, List<Course>> studentToCourses = generationTestData.getCoursesConnectionToStudent(students, courses);
+        List<Student> studentsWithCourses = generationTestData.getCoursesConnectionToStudent(students, courses);
 
         //insert the relationship between students and courses
-        studentDAO.insertStudentsToCourses(studentToCourses);
+        studentDAO.insertStudentsToCourses(studentsWithCourses);
     }
 
     /**

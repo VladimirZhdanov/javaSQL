@@ -111,6 +111,10 @@ public class Student {
         return lastName;
     }
 
+    public List<Course> getCourses() {
+        return courses;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
