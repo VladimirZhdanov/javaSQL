@@ -3,6 +3,9 @@ package com.foxminded.university.dao;
 import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.GroupDAO;
 import com.foxminded.university.domain.Group;
+import com.foxminded.university.exceptions.DAOException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -19,6 +23,8 @@ import java.util.Set;
  * @since 0.1
  */
 public class GroupSQL implements GroupDAO {
+
+    private Properties properties;
     /**
      * Connection pool and connection fabric.
      */
@@ -31,6 +37,22 @@ public class GroupSQL implements GroupDAO {
      */
     public GroupSQL(DataSource dataSource) {
         this.dataSource = dataSource;
+        properties = new Properties();
+        init();
+    }
+
+    /**
+     * Initialisation properties.
+     */
+    private void init() {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("queriesDAO.properties")) {
+            if (is == null) {
+                throw new DAOException("Null was passed.");
+            }
+            properties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -43,14 +65,7 @@ public class GroupSQL implements GroupDAO {
     public List<Group> findGroups(int amountStudents) {
         List<Group> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM groups "
-                     + "WHERE group_name IN ("
-                     + "  SELECT groups.group_name "
-                     + "  FROM groups "
-                     + "         LEFT JOIN students "
-                     + "                   ON students.group_id = groups.group_id "
-                     + "  GROUP BY groups.group_id "
-                     + "  HAVING COUNT(*) <= ?)")) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("findGroups"))) {
             statement.setInt(1, amountStudents);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -71,8 +86,7 @@ public class GroupSQL implements GroupDAO {
     @Override
     public void insertGroups(Set<Group> groups) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into groups(group_name)"
-                     + " values (?);", Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), Statement.NO_GENERATED_KEYS)) {
             for (Group group : groups) {
                 prepStatement.setString(1, group.getName());
                 prepStatement.addBatch();

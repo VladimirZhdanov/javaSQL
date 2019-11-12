@@ -1,7 +1,9 @@
 package com.foxminded.university.dao.layers;
 
+import com.foxminded.university.domain.Course;
 import com.foxminded.university.domain.Student;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Student DAU
@@ -48,6 +50,13 @@ public interface StudentDAO {
      * @param students - students
      */
     void insertStudents(List<Student> students);
+
+    /**
+     * Inserts relationship: Student - Course.
+     *
+     * @param studentToCourses - relationship: Student - Course
+     */
+    void insertStudentsToCourses(Map<Student, List<Course>> studentToCourses);
 
     /**
      * Adds a course to a student.

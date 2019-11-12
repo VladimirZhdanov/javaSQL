@@ -2,7 +2,12 @@ package com.foxminded.university.dao;
 
 import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.StudentDAO;
+import com.foxminded.university.domain.Course;
+import com.foxminded.university.domain.CoursesConnection;
 import com.foxminded.university.domain.Student;
+import com.foxminded.university.exceptions.DAOException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * DAO layer for the students table.
@@ -18,6 +25,9 @@ import java.util.List;
  * @since 0.1
  */
 public class StudentSQL implements StudentDAO {
+
+    private Properties properties;
+
     /**
      * Connection pool and connection fabric.
      */
@@ -33,6 +43,22 @@ public class StudentSQL implements StudentDAO {
     public StudentSQL(DataSource dataSource) {
         this.dataSource = dataSource;
         courseSQL = new CourseSQL(dataSource);
+        properties = new Properties();
+        init();
+    }
+
+    /**
+     * Initialisation properties.
+     */
+    private void init() {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("queriesDAO.properties")) {
+            if (is == null) {
+                throw new DAOException("Null was passed.");
+            }
+            properties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -45,8 +71,7 @@ public class StudentSQL implements StudentDAO {
     public boolean insertStudent(Student student) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into students(first_name, last_name, group_id)"
-                             + " values (?, ?, ?);",
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudent"),
                      Statement.RETURN_GENERATED_KEYS)) {
             prepStatement.setString(1, student.getFirstName());
             prepStatement.setString(2, student.getLastName());
@@ -75,7 +100,7 @@ public class StudentSQL implements StudentDAO {
     public boolean deleteStudent(int studentId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("DELETE FROM students WHERE student_id = ?;")) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("deleteStudent"))) {
             prepStatement.setInt(1, studentId);
             result = prepStatement.executeUpdate();
         } catch (Exception e) {
@@ -94,11 +119,7 @@ public class StudentSQL implements StudentDAO {
     public List<Student> findStudents(String courseName) {
         List<Student> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM students "
-                     + "WHERE student_id IN ("
-                     + "SELECT student_id "
-                     + "FROM courses_connection as cc INNER JOIN courses as c ON c.course_id = cc.course_id "
-                     + "WHERE course_name = ?);")) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("findStudents"))) {
             statement.setString(1, courseName);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -120,7 +141,7 @@ public class StudentSQL implements StudentDAO {
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM students;")) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("getAllStudents"))) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     students.add(extractStudent(resultSet));
@@ -140,8 +161,7 @@ public class StudentSQL implements StudentDAO {
     @Override
     public void insertStudents(List<Student> students) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into students(first_name, last_name, group_id)"
-                     + " values (?, ?, ?);", Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), Statement.NO_GENERATED_KEYS)) {
             for (Student student : students) {
                 prepStatement.setString(1, student.getFirstName());
                 prepStatement.setString(2, student.getLastName());
@@ -165,9 +185,9 @@ public class StudentSQL implements StudentDAO {
     public boolean addCourse(int studentId, int courseId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) FROM courses_connection WHERE student_id = ? AND course_id = ?;");
+             PreparedStatement selectStatement = connection.prepareStatement(properties.getProperty("countStudentToCourses"));
 
-             PreparedStatement addStatement = connection.prepareStatement("insert into courses_connection(student_id, course_id) values (?, ?);")) {
+             PreparedStatement addStatement = connection.prepareStatement(properties.getProperty("addCourse"))) {
             selectStatement.setInt(1, studentId);
             selectStatement.setInt(2, courseId);
             boolean studentExistence = getStudent(studentId) != null;
@@ -202,7 +222,7 @@ public class StudentSQL implements StudentDAO {
     public Student getStudent(int studentId) {
         Student result = null;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM students WHERE student_id = ?;")) {
+             PreparedStatement selectStatement = connection.prepareStatement(properties.getProperty("getStudent"))) {
             selectStatement.setInt(1, studentId);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -216,6 +236,32 @@ public class StudentSQL implements StudentDAO {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * Inserts relationship: Student - Course.
+     *
+     * @param studentToCourses - relationship: Student - Course
+     */
+    @Override
+    public void insertStudentsToCourses(Map<Student, List<Course>> studentToCourses) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), Statement.NO_GENERATED_KEYS)) {
+            studentToCourses.forEach((student, courses) -> {
+                courses.forEach(course -> {
+                    try {
+                        statement.setInt(1, student.getId());
+                        statement.setInt(2, course.getId());
+                        statement.addBatch();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
+            statement.executeBatch();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

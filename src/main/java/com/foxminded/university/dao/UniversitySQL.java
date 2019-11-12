@@ -4,14 +4,15 @@ import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.CourseDAO;
 import com.foxminded.university.dao.layers.GroupDAO;
 import com.foxminded.university.dao.layers.StudentDAO;
-import com.foxminded.university.domain.CoursesConnection;
+import com.foxminded.university.domain.Course;
+import com.foxminded.university.domain.Group;
+import com.foxminded.university.domain.Student;
 import com.foxminded.university.exceptions.DAOException;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import static org.apache.ibatis.io.Resources.getResourceAsReader;
@@ -27,9 +28,9 @@ public class UniversitySQL {
     private static final String CREATE_DB = "dataBaseCreation.SQL";
     private static final String CREATE_TABLES = "tablesCreation.SQL";
 
-    CourseDAO courseDAO;
-    StudentDAO studentDAO;
-    GroupDAO groupDAO;
+    private CourseDAO courseDAO;
+    private StudentDAO studentDAO;
+    private GroupDAO groupDAO;
     /**
      * Generated data.
      */
@@ -70,10 +71,24 @@ public class UniversitySQL {
         executeQuery(dataSourcePostgres, DROP_DB);
         executeQuery(dataSourcePostgres, CREATE_DB);
         executeQuery(dataSourceUniversity, CREATE_TABLES);
-        studentDAO.insertStudents(generationTestData.getStudents());
-        groupDAO.insertGroups(generationTestData.getGroups());
-        courseDAO.insertCourses(generationTestData.getCourses());
-        insertCourseConnections();
+
+        //get test data
+        List<Student> students = generationTestData.getStudents();
+        Set<Group> groups = generationTestData.getGroups();
+        List<Course> courses = generationTestData.getCourses();
+
+        //insert test data
+        studentDAO.insertStudents(students);
+        groupDAO.insertGroups(groups);
+        courseDAO.insertCourses(courses);
+
+        //get students and courses with id and generate relationship between students and courses
+        students = studentDAO.getAllStudents();
+        courses = courseDAO.getAllCourses();
+        Map<Student, List<Course>> studentToCourses = generationTestData.getCoursesConnectionToStudent(students, courses);
+
+        //insert the relationship between students and courses
+        studentDAO.insertStudentsToCourses(studentToCourses);
     }
 
     /**
@@ -82,25 +97,6 @@ public class UniversitySQL {
     public void dropDataBase() {
         dataSourceUniversity.closeConnection();
         executeQuery(dataSourcePostgres, DROP_DB);
-    }
-
-    /**
-     * Inserts relationships between students and courses into the CourseConnections table
-     */
-    private void insertCourseConnections() {
-        List<CoursesConnection> coursesConnections = generationTestData.getRelationshipBetweenStudentsAndCourses();
-        try (Connection connection = dataSourceUniversity.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into courses_connection(student_id, course_id)"
-                     + " values (?, ?);", Statement.NO_GENERATED_KEYS)) {
-            for (CoursesConnection coursesConnection : coursesConnections) {
-                prepStatement.setInt(1, coursesConnection.getStudentId());
-                prepStatement.setInt(2, coursesConnection.getCourseId());
-                prepStatement.addBatch();
-            }
-            prepStatement.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

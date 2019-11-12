@@ -3,6 +3,9 @@ package com.foxminded.university.dao;
 import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.CourseDAO;
 import com.foxminded.university.domain.Course;
+import com.foxminded.university.exceptions.DAOException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,12 +13,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 public class CourseSQL implements CourseDAO {
+
+    private Properties properties;
+
     /**
      * Connection pool and connection fabric.
      */
@@ -28,6 +35,22 @@ public class CourseSQL implements CourseDAO {
      */
     public CourseSQL(DataSource dataSource) {
         this.dataSource = dataSource;
+        properties = new Properties();
+        init();
+    }
+
+    /**
+     * Initialisation properties.
+     */
+    private void init() {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("queriesDAO.properties")) {
+            if (is == null) {
+                throw new DAOException("Null was passed.");
+            }
+            properties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -40,7 +63,7 @@ public class CourseSQL implements CourseDAO {
     public Course getCourse(int courseId) {
         Course result = null;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM courses WHERE course_id = ?;")) {
+             PreparedStatement selectStatement = connection.prepareStatement(properties.getProperty("getCourse"))) {
             selectStatement.setInt(1, courseId);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -62,8 +85,7 @@ public class CourseSQL implements CourseDAO {
     @Override
     public void insertCourses(List<Course> courses) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("insert into courses(course_name, course_description)"
-                     + " values (?, ?);", Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertCourses"), Statement.NO_GENERATED_KEYS)) {
             for (Course course : courses) {
                 prepStatement.setString(1, course.getName());
                 prepStatement.setString(2, course.getDescription());
@@ -84,7 +106,7 @@ public class CourseSQL implements CourseDAO {
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM courses;")) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("getAllCourses"))) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     courses.add(extractCourse(resultSet));
@@ -106,11 +128,7 @@ public class CourseSQL implements CourseDAO {
     public List<Course> getByStudentId(int studentId) {
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT courses.course_id, courses.course_name, courses.course_description "
-                     + "FROM courses_connection"
-                     + "INNER JOIN courses"
-                     + "ON courses_connection.course_id = courses.course_id"
-                     + "WHERE courses_connection.student_id = ?")) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("getByStudentId"))) {
             statement.setInt(1, studentId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -134,7 +152,7 @@ public class CourseSQL implements CourseDAO {
     public boolean removeCourse(int studentId, int courseId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement("DELETE FROM courses_connection WHERE student_id = ? and course_id = ?;")) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("removeCourse"))) {
             prepStatement.setInt(1, studentId);
             prepStatement.setInt(2, courseId);
             result = prepStatement.executeUpdate();

@@ -4,15 +4,7 @@ import com.foxminded.university.domain.Course;
 import com.foxminded.university.domain.CoursesConnection;
 import com.foxminded.university.domain.Group;
 import com.foxminded.university.domain.Student;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.shuffle;
 import static java.util.List.of;
@@ -68,20 +60,26 @@ public class GenerationTestData {
     }
 
     /**
-     * Assign courses(1-3 to each student) to students and get list of it: Student - Course
+     * Assigns courses(1-3 to each student) to students
      *
-     * @return - list of relationship: Student - Course
+     * @param students - students
+     * @param courses - courses
+     * @return - Relationship Between Students And Courses
      */
-    public List<CoursesConnection> getRelationshipBetweenStudentsAndCourses() {
-        List<CoursesConnection> coursesConnections = new ArrayList<>();
-        for (int i = 1; i <= 200; i++) {
+    public Map<Student, List<Course>> getCoursesConnectionToStudent(List<Student> students, List<Course> courses) {
+        Map<Student, List<Course>> result = new HashMap<>();
+        for (Student student : students) {
             int amountOfCourses = random.nextInt(3) + 1;
-            List<Integer> list = randomTen();
-            for (int j = 0; j < amountOfCourses; j++) {
-                coursesConnections.add(new CoursesConnection(i, list.get(j)));
+            List<Course> courseTemp = new ArrayList<>(courses);
+            List<Course> studentCourses = new ArrayList<>();
+            Collections.shuffle(courseTemp);
+            for (int i = 0; i < amountOfCourses; i++) {
+                Course studentCourse = courseTemp.get(i);
+                studentCourses.add(studentCourse);
             }
+            result.put(student, studentCourses);
         }
-        return coursesConnections;
+        return result;
     }
 
     /**

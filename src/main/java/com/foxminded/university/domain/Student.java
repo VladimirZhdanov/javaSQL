@@ -1,5 +1,6 @@
 package com.foxminded.university.domain;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,7 @@ public class Student {
     private int groupId;
     private String firstName;
     private String lastName;
+    private List<Course> courses;
 
     /**
      * Constructor of the class.
@@ -56,6 +58,23 @@ public class Student {
     public Student() {
     }
 
+    /**
+     * Constructor of the class.
+     *
+     * @param id - id
+     * @param groupId - group id
+     * @param firstName - first name
+     * @param lastName - last name
+     * @param courses - courses
+     */
+    public Student(int id, int groupId, String firstName, String lastName, List<Course> courses) {
+        this.id = id;
+        this.groupId = groupId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.courses = courses;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -70,6 +89,10 @@ public class Student {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
     }
 
     public int getId() {

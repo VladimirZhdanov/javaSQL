@@ -64,4 +64,13 @@ public class Course {
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return "Course{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + '}';
+    }
 }
