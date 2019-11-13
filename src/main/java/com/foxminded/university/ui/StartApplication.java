@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
-public class StartUI {
+public class StartApplication {
     private static final String POSTGRES_PROPERTIES = "postgres.properties";
     private static final String UNIVERSITY_PROPERTIES = "university.properties";
     private Config configPostgres;
@@ -58,7 +58,7 @@ public class StartUI {
      * @param input - input
      * @param output - output
      */
-    public StartUI(Input input, Consumer<String> output) {
+    public StartApplication(Input input, Consumer<String> output) {
         configPostgres = new Config();
         configUniversity = new Config();
         try {
@@ -106,7 +106,7 @@ public class StartUI {
      * @param args - args
      */
     public static void main(String[] args) {
-        new StartUI(new ValidateInput(
+        new StartApplication(new ValidateInput(
                 new ConsoleInput()), System.out::println).init();
     }
 }

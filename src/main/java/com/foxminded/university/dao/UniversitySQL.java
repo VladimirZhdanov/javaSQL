@@ -11,7 +11,6 @@ import com.foxminded.university.exceptions.DAOException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
@@ -78,17 +77,17 @@ public class UniversitySQL {
         List<Course> courses = generationTestData.getCourses();
 
         //insert test data
-        studentDAO.insertStudents(students);
-        groupDAO.insertGroups(groups);
-        courseDAO.insertCourses(courses);
+        studentDAO.insert(students);
+        groupDAO.insert(groups);
+        courseDAO.insert(courses);
 
         //get students and courses with id and generate relationship between students and courses
         students = studentDAO.getAllStudents();
         courses = courseDAO.getAllCourses();
-        List<Student> studentsWithCourses = generationTestData.getCoursesConnectionToStudent(students, courses);
+        students = generationTestData.assignCoursesToStudent(students, courses);
 
         //insert the relationship between students and courses
-        studentDAO.insertStudentsToCourses(studentsWithCourses);
+        studentDAO.insertRelationshipStudentsToCourses(students);
     }
 
     /**

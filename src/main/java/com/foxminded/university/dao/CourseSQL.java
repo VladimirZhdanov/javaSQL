@@ -60,7 +60,7 @@ public class CourseSQL implements CourseDAO {
      * @return Course instance
      */
     @Override
-    public Course getCourse(int courseId) {
+    public Course getCourseById(int courseId) {
         Course result = null;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement selectStatement = connection.prepareStatement(properties.getProperty("getCourse"))) {
@@ -83,7 +83,7 @@ public class CourseSQL implements CourseDAO {
      * Inserts courses into the course table
      */
     @Override
-    public void insertCourses(List<Course> courses) {
+    public void insert(List<Course> courses) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertCourses"), Statement.NO_GENERATED_KEYS)) {
             for (Course course : courses) {
@@ -125,7 +125,7 @@ public class CourseSQL implements CourseDAO {
      * @return - courses
      */
     @Override
-    public List<Course> getByStudentId(int studentId) {
+    public List<Course> getCoursesByStudentId(int studentId) {
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("getByStudentId"))) {
@@ -146,10 +146,10 @@ public class CourseSQL implements CourseDAO {
      *
      * @param studentId - student id
      * @param courseId - course id
-     * @return - removed / didn't remove - boolean
+     * @return - removed / didn't removeCourseByStudentIdAndCourseId - boolean
      */
     @Override
-    public boolean removeCourse(int studentId, int courseId) {
+    public boolean removeCourseByStudentIdAndCourseId(int studentId, int courseId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("removeCourse"))) {

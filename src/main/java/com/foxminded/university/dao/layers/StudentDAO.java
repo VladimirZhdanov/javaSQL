@@ -19,23 +19,38 @@ public interface StudentDAO {
      * @param student - student
      * @return - added\didn't add - boolean
      */
-    boolean insertStudent(Student student);
+    boolean insert(Student student);
 
     /**
-     * Deletes a student from university by id.
+     * Inserts passed students.
      *
-     * @param studentId - student id.
-     * @return deleted/did not - boolean
+     * @param students - students
      */
-    boolean deleteStudent(int studentId);
+    void insert(List<Student> students);
 
     /**
-     * Finds all students related to the passed course name.
+     * Inserts relationship: Student - Course.
      *
-     * @param courseName - course name
-     * @return - list of student
+     * @param studentsWithCourses - students with relationship: Student - Course
      */
-    List<Student> findStudents(String courseName);
+    void insertRelationshipStudentsToCourses(List<Student> studentsWithCourses);
+
+    /**
+     * Inserts a course to a student.
+     *
+     * @param studentId - student id
+     * @param courseId - student id
+     * @return - added\didn't add - boolean
+     */
+    boolean insertCourseToStudentById(int studentId, int courseId);
+
+    /**
+     * Finding the student by id.
+     *
+     * @param studentId - student id
+     * @return - Student instance
+     */
+    Student getStudent(int studentId);
 
     /**
      * Gets all students.
@@ -45,42 +60,27 @@ public interface StudentDAO {
     List<Student> getAllStudents();
 
     /**
-     * Inserts passed students.
+     * Finds all students related to the passed course name.
      *
-     * @param students - students
+     * @param courseName - course name
+     * @return - list of student
      */
-    void insertStudents(List<Student> students);
+    List<Student> getStudentsByCourse(String courseName);
 
     /**
-     * Inserts relationship: Student - Course.
+     * Removes a student from university by id.
      *
-     * @param studentsWithCourses - students with relationship: Student - Course
+     * @param studentId - student id.
+     * @return deleted/did not - boolean
      */
-    void insertStudentsToCourses(List<Student> studentsWithCourses);
-
-    /**
-     * Adds a course to a student.
-     *
-     * @param studentId - student id
-     * @param courseId - student id
-     * @return - added\didn't add - boolean
-     */
-    boolean addCourse(int studentId, int courseId);
+    boolean removeStudentById(int studentId);
 
     /**
      * Removes course from a student
      *
      * @param studentId - student id
      * @param courseId - course id
-     * @return - removed / didn't remove - boolean
+     * @return - removed / didn't removeCourseByStudentIdAndCourseId - boolean
      */
-    boolean removeCourse(int studentId, int courseId);
-
-    /**
-     * Finding the student by id.
-     *
-     * @param studentId - student id
-     * @return - Student instance
-     */
-    Student getStudent(int studentId);
+    boolean removeCourseById(int studentId, int courseId);
 }

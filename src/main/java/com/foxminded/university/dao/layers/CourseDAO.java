@@ -8,18 +8,19 @@ import java.util.List;
  * @since 0.1
  */
 public interface CourseDAO {
+
+    /**
+     * Inserts courses into the course table
+     */
+    void insert(List<Course> courses);
+
     /**
      * Gets course by ID.
      *
      * @param courseId - course id
      * @return Course instance
      */
-    Course getCourse(int courseId);
-
-    /**
-     * Inserts courses into the course table
-     */
-    void insertCourses(List<Course> courses);
+    Course getCourseById(int courseId);
 
     /**
      * Gets all courses.
@@ -34,7 +35,7 @@ public interface CourseDAO {
      * @param studentId - student id
      * @return - courses
      */
-    List<Course> getByStudentId(int studentId);
+    List<Course> getCoursesByStudentId(int studentId);
 
     /**
      * Removes course from a student
@@ -43,5 +44,5 @@ public interface CourseDAO {
      * @param courseId - course id
      * @return - removed / didn't remove - boolean
      */
-    boolean removeCourse(int studentId, int courseId);
+    boolean removeCourseByStudentIdAndCourseId(int studentId, int courseId);
 }

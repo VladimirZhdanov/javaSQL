@@ -62,7 +62,7 @@ public class GroupSQL implements GroupDAO {
      * @return - list of groups
      */
     @Override
-    public List<Group> findGroups(int amountStudents) {
+    public List<Group> getGroupsByStudentCount(int amountStudents) {
         List<Group> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("findGroups"))) {
@@ -84,7 +84,7 @@ public class GroupSQL implements GroupDAO {
      * @param groups - groups
      */
     @Override
-    public void insertGroups(Set<Group> groups) {
+    public void insert(Set<Group> groups) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), Statement.NO_GENERATED_KEYS)) {
             for (Group group : groups) {

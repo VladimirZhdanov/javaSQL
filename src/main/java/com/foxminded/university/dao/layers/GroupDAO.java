@@ -13,17 +13,17 @@ import java.util.Set;
 public interface GroupDAO {
 
     /**
+     * Inserts passed groups.
+     *
+     * @param groups - groups
+     */
+    void insert(Set<Group> groups);
+
+    /**
      * Finds all groups related to the passed amount of students.
      *
      * @param amountStudents - amount of students
      * @return - list of groups
      */
-    List<Group> findGroups(int amountStudents);
-
-    /**
-     * Inserts passed groups.
-     *
-     * @param groups - groups
-     */
-    void insertGroups(Set<Group> groups);
+    List<Group> getGroupsByStudentCount(int amountStudents);
 }

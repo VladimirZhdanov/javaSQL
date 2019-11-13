@@ -3,7 +3,6 @@ package com.foxminded.university.dao;
 import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.StudentDAO;
 import com.foxminded.university.domain.Course;
-import com.foxminded.university.domain.CoursesConnection;
 import com.foxminded.university.domain.Student;
 import com.foxminded.university.exceptions.DAOException;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -68,7 +66,7 @@ public class StudentSQL implements StudentDAO {
      * @return - added\didn't add - boolean
      */
     @Override
-    public boolean insertStudent(Student student) {
+    public boolean insert(Student student) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudent"),
@@ -97,7 +95,7 @@ public class StudentSQL implements StudentDAO {
      * @return deleted/did not - boolean
      */
     @Override
-    public boolean deleteStudent(int studentId) {
+    public boolean removeStudentById(int studentId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("deleteStudent"))) {
@@ -116,7 +114,7 @@ public class StudentSQL implements StudentDAO {
      * @return - list of student
      */
     @Override
-    public List<Student> findStudents(String courseName) {
+    public List<Student> getStudentsByCourse(String courseName) {
         List<Student> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("findStudents"))) {
@@ -159,7 +157,7 @@ public class StudentSQL implements StudentDAO {
      * @param students - students
      */
     @Override
-    public void insertStudents(List<Student> students) {
+    public void insert(List<Student> students) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), Statement.NO_GENERATED_KEYS)) {
             for (Student student : students) {
@@ -182,7 +180,7 @@ public class StudentSQL implements StudentDAO {
      * @return - added\didn't add - boolean
      */
     @Override
-    public boolean addCourse(int studentId, int courseId) {
+    public boolean insertCourseToStudentById(int studentId, int courseId) {
         int result = 0;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement selectStatement = connection.prepareStatement(properties.getProperty("countStudentToCourses"));
@@ -191,7 +189,7 @@ public class StudentSQL implements StudentDAO {
             selectStatement.setInt(1, studentId);
             selectStatement.setInt(2, courseId);
             boolean studentExistence = getStudent(studentId) != null;
-            boolean courseExistence = courseSQL.getCourse(courseId) != null;
+            boolean courseExistence = courseSQL.getCourseById(courseId) != null;
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 while (resultSet.next()) {
                     if (resultSet.getInt(1) == 0 && studentExistence && courseExistence) {
@@ -208,7 +206,7 @@ public class StudentSQL implements StudentDAO {
     }
 
     @Override
-    public boolean removeCourse(int studentId, int courseId) {
+    public boolean removeCourseById(int studentId, int courseId) {
         return false;
     }
 
@@ -244,7 +242,7 @@ public class StudentSQL implements StudentDAO {
      * @param studentsWithCourses - students with relationship: Student - Course
      */
     @Override
-    public void insertStudentsToCourses(List<Student> studentsWithCourses) {
+    public void insertRelationshipStudentsToCourses(List<Student> studentsWithCourses) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), Statement.NO_GENERATED_KEYS)) {
             studentsWithCourses.forEach(student -> {

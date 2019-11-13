@@ -66,7 +66,7 @@ public class GenerationTestData {
      * @param courses - courses
      * @return - students with Relationship Between Students And Courses
      */
-    public List<Student> getCoursesConnectionToStudent(List<Student> students, List<Course> courses) {
+    public List<Student> assignCoursesToStudent(List<Student> students, List<Course> courses) {
         for (Student student : students) {
             int amountOfCourses = random.nextInt(3) + 1;
             List<Course> courseTemp = new ArrayList<>(courses);
@@ -79,17 +79,6 @@ public class GenerationTestData {
             student.setCourses(studentCourses);
         }
         return students;
-    }
-
-    /**
-     * Gets shuffled list of 10
-     *
-     * @return - shuffled list of 10
-     */
-    private List<Integer> randomTen() {
-        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        shuffle(list);
-        return list;
     }
 
     /**

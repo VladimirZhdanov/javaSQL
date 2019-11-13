@@ -1,8 +1,5 @@
 package com.foxminded.university.ui;
 
-import com.foxminded.university.dao.CourseSQL;
-import com.foxminded.university.dao.GroupSQL;
-import com.foxminded.university.dao.StudentSQL;
 import com.foxminded.university.dao.layers.CourseDAO;
 import com.foxminded.university.dao.layers.GroupDAO;
 import com.foxminded.university.dao.layers.StudentDAO;
@@ -102,7 +99,7 @@ public class Menu {
                 groupId = input.ask("Enter a group id for teh student :");
             }
             Student student = new Student(firstName, lastName, parseInt(groupId));
-            if (!studentDAO.insertStudent(student)) {
+            if (!studentDAO.insert(student)) {
                 output.accept("The student has not been added!");
             } else {
                 System.out.printf("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR);
@@ -138,7 +135,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!studentDAO.addCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!studentDAO.insertCourseToStudentById(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be added!");
             } else {
                 System.out.printf("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -147,7 +144,7 @@ public class Menu {
     }
 
     /**
-     * Inner class to remove course from student.
+     * Inner class to removeCourseByStudentIdAndCourseId course from student.
      */
     private class RemoveCourseFromStudent extends BaseAction {
 
@@ -174,7 +171,7 @@ public class Menu {
                 studentId = input.ask("Enter the student id :");
                 courseId = input.ask("Enter a course id :");
             }
-            if (!courseDAO.removeCourse(parseInt(studentId), parseInt(courseId))) {
+            if (!courseDAO.removeCourseByStudentIdAndCourseId(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be removed!");
             } else {
                 System.out.printf("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
@@ -208,7 +205,7 @@ public class Menu {
             while (!amountStudents.matches("[0-9]+")) {
                 amountStudents = input.ask("Enter student amount :");
             }
-            List<Group> groups = groupDAO.findGroups(parseInt(amountStudents));
+            List<Group> groups = groupDAO.getGroupsByStudentCount(parseInt(amountStudents));
             if (groups.size() == 0) {
                 System.out.println("Groups have not found.");
             } else {
@@ -240,7 +237,7 @@ public class Menu {
         @Override
         public void execute(Input input) {
             String courseName = input.ask("Enter course name :");
-            List<Student> students = studentDAO.findStudents(courseName);
+            List<Student> students = studentDAO.getStudentsByCourse(courseName);
             if (students.size() == 0) {
                 System.out.println("Students have not found.");
             } else {
@@ -250,7 +247,7 @@ public class Menu {
     }
 
     /**
-     * Inner class to remove student from university.
+     * Inner class to removeCourseByStudentIdAndCourseId student from university.
      */
     private class RemoveStudent extends BaseAction {
 
@@ -275,7 +272,7 @@ public class Menu {
             while (!id.matches("[0-9]+")) {
                 id = input.ask("Enter student id :");
             }
-            if (!studentDAO.deleteStudent(parseInt(id))) {
+            if (!studentDAO.removeStudentById(parseInt(id))) {
                 output.accept("The id is not exist!");
             } else {
                 output.accept(String.format("------------ The student (id: %s) is not longer in our university -----------", id));
@@ -292,7 +289,7 @@ public class Menu {
         /**
          * Start point of the application.
          */
-        private final StartUI ui;
+        private final StartApplication ui;
 
         /**
          * Constructor of the inner class.
@@ -300,7 +297,7 @@ public class Menu {
          * @param key - key of action
          * @param name - name of the action
          */
-        public ExitProgram(StartUI ui, int key, String name) {
+        public ExitProgram(StartApplication ui, int key, String name) {
             super(key, name);
             this.ui = ui;
         }
@@ -321,7 +318,7 @@ public class Menu {
      *
      * @param ui - Start point of the application.
      */
-    public void fillActions(StartUI ui) {
+    public void fillActions(StartApplication ui) {
         this.actions.add(this.new FindGroups(0, "Find all groups with less or equals student count"));
         this.actions.add(this.new FindStudents(1, "Find all students related to course with given name"));
         this.actions.add(this.new AddStudent(2, "Add new student"));
