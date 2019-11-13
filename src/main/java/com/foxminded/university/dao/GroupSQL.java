@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import static java.sql.Statement.NO_GENERATED_KEYS;
+
 /**
  * DAO layer for the groups table.
  *
@@ -86,7 +88,7 @@ public class GroupSQL implements GroupDAO {
     @Override
     public void insert(Set<Group> groups) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), NO_GENERATED_KEYS)) {
             for (Group group : groups) {
                 prepStatement.setString(1, group.getName());
                 prepStatement.addBatch();

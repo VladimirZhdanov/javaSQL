@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static java.sql.Statement.NO_GENERATED_KEYS;
+
 /**
  * DAO layer for the students table.
  *
@@ -159,7 +161,7 @@ public class StudentSQL implements StudentDAO {
     @Override
     public void insert(List<Student> students) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), NO_GENERATED_KEYS)) {
             for (Student student : students) {
                 prepStatement.setString(1, student.getFirstName());
                 prepStatement.setString(2, student.getLastName());
@@ -244,7 +246,7 @@ public class StudentSQL implements StudentDAO {
     @Override
     public void insertRelationshipStudentsToCourses(List<Student> studentsWithCourses) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), NO_GENERATED_KEYS)) {
             studentsWithCourses.forEach(student -> {
                 List<Course> courses = student.getCourses();
                 courses.forEach(course -> {

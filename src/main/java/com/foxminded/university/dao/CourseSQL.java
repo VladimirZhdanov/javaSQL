@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static java.sql.Statement.NO_GENERATED_KEYS;
+
 /**
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
@@ -85,7 +87,7 @@ public class CourseSQL implements CourseDAO {
     @Override
     public void insert(List<Course> courses) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertCourses"), Statement.NO_GENERATED_KEYS)) {
+             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertCourses"), NO_GENERATED_KEYS)) {
             for (Course course : courses) {
                 prepStatement.setString(1, course.getName());
                 prepStatement.setString(2, course.getDescription());
