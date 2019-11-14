@@ -98,7 +98,7 @@ public class Menu {
             while (!groupId.matches("[0-9]+")) {
                 groupId = input.ask("Enter a group id for teh student :");
             }
-            Student student = new Student(firstName, lastName, parseInt(groupId));
+            Student student = new Student(parseInt(groupId), firstName, lastName);
             if (!studentDAO.insert(student)) {
                 output.accept("The student has not been added!");
             } else {

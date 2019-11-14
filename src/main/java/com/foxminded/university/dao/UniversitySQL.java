@@ -8,11 +8,8 @@ import com.foxminded.university.domain.Course;
 import com.foxminded.university.domain.Group;
 import com.foxminded.university.domain.Student;
 import com.foxminded.university.exceptions.DAOException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import org.apache.ibatis.jdbc.ScriptRunner;
 
 import static org.apache.ibatis.io.Resources.getResourceAsReader;
 
@@ -23,6 +20,8 @@ import static org.apache.ibatis.io.Resources.getResourceAsReader;
  * @since 0.1
  */
 public class UniversitySQL {
+    ExecuterQuery executerQuery;
+
     private static final String DROP_DB = "dropDB.SQL";
     private static final String CREATE_DB = "dataBaseCreation.SQL";
     private static final String CREATE_TABLES = "tablesCreation.SQL";
@@ -52,6 +51,8 @@ public class UniversitySQL {
      * @param dataSourceUniversity - dataSource for admin
      */
     public UniversitySQL(DataSource dataSourcePostgres, DataSource dataSourceUniversity) {
+        executerQuery = new ExecuterQuery();
+
         if (dataSourcePostgres == null && dataSourceUniversity == null) {
             throw new DAOException("Null was passed to the constructor...");
         }
@@ -67,9 +68,9 @@ public class UniversitySQL {
      * Creates DB, user, tables and insert test data into the tables.
      */
     public void setDateBase() {
-        executeQuery(dataSourcePostgres, DROP_DB);
-        executeQuery(dataSourcePostgres, CREATE_DB);
-        executeQuery(dataSourceUniversity, CREATE_TABLES);
+        executerQuery.execute(dataSourcePostgres, DROP_DB);
+        executerQuery.execute(dataSourcePostgres, CREATE_DB);
+        executerQuery.execute(dataSourceUniversity, CREATE_TABLES);
 
         //get test data
         List<Student> students = generationTestData.getStudents();
@@ -95,26 +96,6 @@ public class UniversitySQL {
      */
     public void dropDataBase() {
         dataSourceUniversity.closeConnection();
-        executeQuery(dataSourcePostgres, DROP_DB);
-    }
-
-    /**
-     * Executes a query depends on data source.
-     *
-     * @param dataSource - data source
-     * @param fileName - file name of query
-     */
-    private void executeQuery(DataSource dataSource, String fileName) {
-        try {
-            ScriptRunner runner = new ScriptRunner(dataSource.getConnection());
-            runner.setAutoCommit(true);
-            runner.setStopOnError(true);
-            runner.runScript(getResourceAsReader(fileName));
-            runner.closeConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executerQuery.execute(dataSourcePostgres, DROP_DB);
     }
 }

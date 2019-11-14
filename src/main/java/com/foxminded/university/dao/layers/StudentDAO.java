@@ -74,13 +74,4 @@ public interface StudentDAO {
      * @return deleted/did not - boolean
      */
     boolean removeStudentById(int studentId);
-
-    /**
-     * Removes course from a student
-     *
-     * @param studentId - student id
-     * @param courseId - course id
-     * @return - removed / didn't removeCourseByStudentIdAndCourseId - boolean
-     */
-    boolean removeCourseById(int studentId, int courseId);
 }

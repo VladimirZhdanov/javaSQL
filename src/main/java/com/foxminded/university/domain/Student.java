@@ -34,7 +34,7 @@ public class Student {
      * @param lastName - last name
      * @param groupId - group id
      */
-    public Student(String firstName, String lastName, int groupId) {
+    public Student(int groupId, String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.groupId = groupId;
@@ -69,6 +69,21 @@ public class Student {
      */
     public Student(int id, int groupId, String firstName, String lastName, List<Course> courses) {
         this.id = id;
+        this.groupId = groupId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.courses = courses;
+    }
+
+    /**
+     * Constructor of the class.
+     *
+     * @param groupId - group id
+     * @param firstName - first name
+     * @param lastName - last name
+     * @param courses - courses
+     */
+    public Student(int groupId, String firstName, String lastName, List<Course> courses) {
         this.groupId = groupId;
         this.firstName = firstName;
         this.lastName = lastName;

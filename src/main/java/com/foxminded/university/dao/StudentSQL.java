@@ -26,6 +26,8 @@ import static java.sql.Statement.NO_GENERATED_KEYS;
  */
 public class StudentSQL implements StudentDAO {
 
+    private static final String NULL_WAS_PASSED = "Null was passed";
+
     private Properties properties;
 
     /**
@@ -69,6 +71,9 @@ public class StudentSQL implements StudentDAO {
      */
     @Override
     public boolean insert(Student student) {
+        if (student == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         int result = 0;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudent"),
@@ -117,6 +122,9 @@ public class StudentSQL implements StudentDAO {
      */
     @Override
     public List<Student> getStudentsByCourse(String courseName) {
+        if (courseName == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         List<Student> students = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("findStudents"))) {
@@ -160,6 +168,9 @@ public class StudentSQL implements StudentDAO {
      */
     @Override
     public void insert(List<Student> students) {
+        if (students == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), NO_GENERATED_KEYS)) {
             for (Student student : students) {
@@ -207,11 +218,6 @@ public class StudentSQL implements StudentDAO {
         return result == 1;
     }
 
-    @Override
-    public boolean removeCourseById(int studentId, int courseId) {
-        return false;
-    }
-
     /**
      * Gets the student by id.
      *
@@ -241,13 +247,17 @@ public class StudentSQL implements StudentDAO {
     /**
      * Inserts relationship: Student - Course.
      *
-     * @param studentsWithCourses - students with relationship: Student - Course
+     * @param students - students with relationship: Student - Course
      */
     @Override
-    public void insertRelationshipStudentsToCourses(List<Student> studentsWithCourses) {
+    public void insertRelationshipStudentsToCourses(List<Student> students) {
+        if (students == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudentsToCourses"), NO_GENERATED_KEYS)) {
-            studentsWithCourses.forEach(student -> {
+
+            students.forEach(student -> {
                 List<Course> courses = student.getCourses();
                 courses.forEach(course -> {
                     try {
