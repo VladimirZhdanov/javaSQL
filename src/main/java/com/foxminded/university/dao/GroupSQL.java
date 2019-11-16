@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +24,8 @@ import static java.sql.Statement.NO_GENERATED_KEYS;
  * @since 0.1
  */
 public class GroupSQL implements GroupDAO {
+
+    private static final String NULL_WAS_PASSED = "Null was passed";
 
     private Properties properties;
     /**
@@ -87,6 +88,9 @@ public class GroupSQL implements GroupDAO {
      */
     @Override
     public void insert(Set<Group> groups) {
+        if (groups == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         try (Connection connection = dataSource.getConnection();
              PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), NO_GENERATED_KEYS)) {
             for (Group group : groups) {

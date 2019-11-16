@@ -1,6 +1,7 @@
 package com.foxminded.university.ui;
 
 import com.foxminded.university.dao.CourseSQL;
+import com.foxminded.university.dao.ExecutorQuery;
 import com.foxminded.university.dao.GroupSQL;
 import com.foxminded.university.dao.StudentSQL;
 import com.foxminded.university.dao.connection.Config;
@@ -21,6 +22,7 @@ public class StartApplication {
     private static final String UNIVERSITY_PROPERTIES = "university.properties";
     private Config configPostgres;
     private Config configUniversity;
+    private ExecutorQuery executorQuery;
 
     /**
      * Connection pool and connection fabric (postgres).
@@ -59,17 +61,14 @@ public class StartApplication {
      * @param output - output
      */
     public StartApplication(Input input, Consumer<String> output) {
+        executorQuery = new ExecutorQuery();
         configPostgres = new Config();
         configUniversity = new Config();
-        try {
-            configPostgres.loadProperties(POSTGRES_PROPERTIES);
-            configUniversity.loadProperties(UNIVERSITY_PROPERTIES);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        configPostgres.loadProperties(POSTGRES_PROPERTIES);
+        configUniversity.loadProperties(UNIVERSITY_PROPERTIES);
         this.dataSourcePostgres = new DataSource(configPostgres);
         this.dataSourceUniversity = new DataSource(configUniversity);
-        this.universitySQL = new UniversitySQL(dataSourcePostgres, dataSourceUniversity);
+        this.universitySQL = new UniversitySQL(dataSourcePostgres, dataSourceUniversity, executorQuery);
         this.groupDAO = new GroupSQL(dataSourceUniversity);
         this.studentDAO = new StudentSQL(dataSourceUniversity);
         this.courseDAO = new CourseSQL(dataSourceUniversity);

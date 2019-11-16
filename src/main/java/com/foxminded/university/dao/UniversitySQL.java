@@ -20,7 +20,7 @@ import static org.apache.ibatis.io.Resources.getResourceAsReader;
  * @since 0.1
  */
 public class UniversitySQL {
-    ExecuterQuery executerQuery;
+    private ExecutorQuery executorQuery;
 
     private static final String DROP_DB = "dropDB.SQL";
     private static final String CREATE_DB = "dataBaseCreation.SQL";
@@ -50,8 +50,8 @@ public class UniversitySQL {
      * @param dataSourcePostgres - dataSource for postgres
      * @param dataSourceUniversity - dataSource for admin
      */
-    public UniversitySQL(DataSource dataSourcePostgres, DataSource dataSourceUniversity) {
-        executerQuery = new ExecuterQuery();
+    public UniversitySQL(DataSource dataSourcePostgres, DataSource dataSourceUniversity, ExecutorQuery executorQuery) {
+        this.executorQuery = executorQuery;
 
         if (dataSourcePostgres == null && dataSourceUniversity == null) {
             throw new DAOException("Null was passed to the constructor...");
@@ -68,9 +68,9 @@ public class UniversitySQL {
      * Creates DB, user, tables and insert test data into the tables.
      */
     public void setDateBase() {
-        executerQuery.execute(dataSourcePostgres, DROP_DB);
-        executerQuery.execute(dataSourcePostgres, CREATE_DB);
-        executerQuery.execute(dataSourceUniversity, CREATE_TABLES);
+        executorQuery.execute(dataSourcePostgres, DROP_DB);
+        executorQuery.execute(dataSourcePostgres, CREATE_DB);
+        executorQuery.execute(dataSourceUniversity, CREATE_TABLES);
 
         //get test data
         List<Student> students = generationTestData.getStudents();
@@ -96,6 +96,6 @@ public class UniversitySQL {
      */
     public void dropDataBase() {
         dataSourceUniversity.closeConnection();
-        executerQuery.execute(dataSourcePostgres, DROP_DB);
+        executorQuery.execute(dataSourcePostgres, DROP_DB);
     }
 }

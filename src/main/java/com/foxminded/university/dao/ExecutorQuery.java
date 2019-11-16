@@ -13,12 +13,12 @@ import static org.apache.ibatis.io.Resources.getResourceAsReader;
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
-public class ExecuterQuery {
+public class ExecutorQuery {
 
     /**
      * Constructor of the class.
      */
-    public ExecuterQuery() {
+    public ExecutorQuery() {
     }
 
     /**

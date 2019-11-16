@@ -1,9 +1,5 @@
-package com.foxminded.university.sql;
+package com.foxminded.university.dao;
 
-import com.foxminded.university.dao.CourseSQL;
-import com.foxminded.university.dao.ExecuterQuery;
-import com.foxminded.university.dao.GenerationTestData;
-import com.foxminded.university.dao.StudentSQL;
 import com.foxminded.university.dao.connection.Config;
 import com.foxminded.university.dao.connection.DataSource;
 import com.foxminded.university.dao.layers.CourseDAO;
@@ -43,11 +39,11 @@ class StudentSQLTest {
     public CourseDAO courseDAO;
 
     public GenerationTestData generationTestData = new GenerationTestData();
-    public ExecuterQuery executerQuery = new ExecuterQuery();
+    public ExecutorQuery executorQuery = new ExecutorQuery();
 
 
     @Mock
-    Config mockedConfig;
+    public Config mockedConfig;
 
     @BeforeEach
     public void setUp() {
@@ -69,7 +65,7 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturnCorrectedNameWhenAddNewStudentWithTheName() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
+        executorQuery.execute(dataSource, CREATE_TABLES);
         studentDAO.insert(generationTestData.getStudents()); //inserts 200 students
         studentDAO.insert(new Student(1, "Lord", "Vladimir"));
         Student student = studentDAO.getStudent(201);
@@ -81,7 +77,7 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturnTrueWhenRemoveStudent() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
+        executorQuery.execute(dataSource, CREATE_TABLES);
         studentDAO.insert(generationTestData.getStudents()); //adds 200 students
         boolean actual = studentDAO.removeStudentById(200);
         assertTrue(actual,
@@ -90,19 +86,9 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturnSizeMoreThanZeroWhenGetStudentByCourseName() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
-
-        List<Student> students = generationTestData.getStudents();
-        List<Course> courses = generationTestData.getCourses();
-        studentDAO.insert(students);
-        courseDAO.insert(courses);
-        students = studentDAO.getAllStudents();
-        courses = courseDAO.getAllCourses();
-        students = generationTestData.assignCoursesToStudent(students, courses);
-        studentDAO.insertRelationshipStudentsToCourses(students);
-
-        students = studentDAO.getStudentsByCourse("History");
-
+        executorQuery.execute(dataSource, CREATE_TABLES);
+        insertTestData();
+        List<Student> students = studentDAO.getStudentsByCourse("History");
         boolean actual = students.size() > 0;
         assertTrue(actual,
                 "Should return true if size of returned list was more than 0");
@@ -110,19 +96,9 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturnSizeZeroWhenGetStudentByUnrealCourseName() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
-
-        List<Student> students = generationTestData.getStudents();
-        List<Course> courses = generationTestData.getCourses();
-        studentDAO.insert(students);
-        courseDAO.insert(courses);
-        students = studentDAO.getAllStudents();
-        courses = courseDAO.getAllCourses();
-        students = generationTestData.assignCoursesToStudent(students, courses);
-        studentDAO.insertRelationshipStudentsToCourses(students);
-
-        students = studentDAO.getStudentsByCourse("Gistory");
-
+        executorQuery.execute(dataSource, CREATE_TABLES);
+        insertTestData();
+        List<Student> students = studentDAO.getStudentsByCourse("Gistory");
         boolean actual = students.size() == 0;
         assertTrue(actual,
                 "Should return true if size of returned list was 0");
@@ -130,7 +106,7 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturn200StudentWhenGetAllInsertedStudent() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
+        executorQuery.execute(dataSource, CREATE_TABLES);
         studentDAO.insert(generationTestData.getStudents()); //adds 200 students
         int expected = 200;
         int actual = studentDAO.getAllStudents().size();
@@ -140,24 +116,13 @@ class StudentSQLTest {
 
     @Test
     public void shouldReturnTrueWhenCourseWasAddedToStudent() {
-        executerQuery.execute(dataSource, CREATE_TABLES);
-
-        List<Student> students = generationTestData.getStudents();
-        List<Course> courses = generationTestData.getCourses();
-        studentDAO.insert(students);
-        courseDAO.insert(courses);
-        students = studentDAO.getAllStudents();
-        courses = courseDAO.getAllCourses();
-        students = generationTestData.assignCoursesToStudent(students, courses);
-        studentDAO.insertRelationshipStudentsToCourses(students);
-
+        executorQuery.execute(dataSource, CREATE_TABLES);
+        insertTestData();
         studentDAO.insert(new Student(1, "Lord", "Vladimir"));
         studentDAO.insertCourseToStudentById(201, 1);
         String courseName = courseDAO.getCourseById(1).getName();
-        courses = courseDAO.getCoursesByStudentId(201);
-
+        List<Course> courses = courseDAO.getCoursesByStudentId(201);
         boolean actual = courses.stream().anyMatch(course -> course.getName().equals(courseName));
-
         assertTrue(actual,
                 "Should return true if course was added to the student");
     }
@@ -188,5 +153,16 @@ class StudentSQLTest {
         Exception exception = assertThrows(DAOException.class, () ->
                 studentDAO.getStudentsByCourse(null));
         assertEquals("Null was passed", exception.getMessage());
+    }
+
+    private void insertTestData() {
+        List<Student> students = generationTestData.getStudents();
+        List<Course> courses = generationTestData.getCourses();
+        studentDAO.insert(students);
+        courseDAO.insert(courses);
+        students = studentDAO.getAllStudents();
+        courses = courseDAO.getAllCourses();
+        students = generationTestData.assignCoursesToStudent(students, courses);
+        studentDAO.insertRelationshipStudentsToCourses(students);
     }
 }

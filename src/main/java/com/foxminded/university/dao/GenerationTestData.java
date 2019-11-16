@@ -4,6 +4,7 @@ import com.foxminded.university.domain.Course;
 import com.foxminded.university.domain.CoursesConnection;
 import com.foxminded.university.domain.Group;
 import com.foxminded.university.domain.Student;
+import com.foxminded.university.exceptions.DAOException;
 import java.util.*;
 
 import static java.util.Collections.shuffle;
@@ -16,6 +17,8 @@ import static java.util.List.of;
  * @since 0.1
  */
 public class GenerationTestData {
+    private static final String NULL_WAS_PASSED = "Null was passed";
+
     /**
      * List of first names.
      */
@@ -67,6 +70,9 @@ public class GenerationTestData {
      * @return - students with Relationship Between Students And Courses
      */
     public List<Student> assignCoursesToStudent(List<Student> students, List<Course> courses) {
+        if (students == null || courses == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
         for (Student student : students) {
             int amountOfCourses = random.nextInt(3) + 1;
             List<Course> courseTemp = new ArrayList<>(courses);

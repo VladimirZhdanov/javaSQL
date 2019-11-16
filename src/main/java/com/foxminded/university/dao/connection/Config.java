@@ -1,6 +1,7 @@
 package com.foxminded.university.dao.connection;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
@@ -34,9 +35,8 @@ public class Config {
      * Load properties.
      *
      * @param fileName - fileName of a properties file
-     * @throws IOException - constructs an IOException with the specified detail message
      */
-    public void loadProperties(String fileName) throws IOException {
+    public void loadProperties(String fileName) {
         if (fileName == null) {
             throw new IllegalArgumentException("Null was passed to the method...");
         }
@@ -49,6 +49,10 @@ public class Config {
             Properties properties = new Properties();
             properties.load(fis);
             loadProperties(properties);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -102,66 +106,4 @@ public class Config {
     public String getDriverName() {
         return driverName;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Properties.
-     private final Properties properties;
-
-     *//**
-     * Constructor of the class.
-     *//*
-    public Config() {
-        properties = new Properties();
-        init();
-    }
-
-    *//**
-     * Constructor of the class.
-     *//*
-    public Config(Properties properties) {
-        this.properties = properties;
-    }
-
-    *//**
-     * Initialisation.
-     *//*
-    private void init() {
-        try (InputStream in = Config.class.getClassLoader().getResourceAsStream("postgres.properties")) {
-            assert in != null;
-            properties.load(in);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    *//**
-     * Gets a specified property.
-     *
-     * @param key - key of property - String
-     * @return - property - String
-     *//*
-    public String get(String key) {
-        return this.properties.getProperty(key);
-    }*/
 }
