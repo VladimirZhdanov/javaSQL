@@ -102,7 +102,7 @@ public class Menu {
             if (!studentDAO.insert(student)) {
                 output.accept("The student has not been added!");
             } else {
-                System.out.printf("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR);
+                output.accept(String.format("Student ID: %d, first name: %s, last name: %s, group ID: %d added.%s", student.getId(), student.getFirstName(), student.getLastName(), student.getGroupId(), LINE_SEPARATOR));
             }
         }
     }
@@ -138,7 +138,7 @@ public class Menu {
             if (!studentDAO.insertCourseToStudentById(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be added!");
             } else {
-                System.out.printf("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
+                output.accept(String.format("Course ID: %s has been added to student ID: %s%s", courseId, studentId, LINE_SEPARATOR));
             }
         }
     }
@@ -174,7 +174,7 @@ public class Menu {
             if (!courseDAO.removeCourseByStudentIdAndCourseId(parseInt(studentId), parseInt(courseId))) {
                 output.accept("The course can't be removed!");
             } else {
-                System.out.printf("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR);
+                output.accept(String.format("Course ID: %s has been removed from student ID: %s%s", courseId, studentId, LINE_SEPARATOR));
             }
         }
     }
@@ -206,10 +206,12 @@ public class Menu {
                 amountStudents = input.ask("Enter student amount :");
             }
             List<Group> groups = groupDAO.getGroupsByStudentCount(parseInt(amountStudents));
-            if (groups.size() == 0) {
-                System.out.println("Groups have not found.");
+            if (groups.isEmpty()) {
+                output.accept("Groups have not found.");
             } else {
-                groups.forEach(System.out::println);
+                for (Group group : groups) {
+                    output.accept(group.toString());
+                }
             }
         }
     }
@@ -238,10 +240,12 @@ public class Menu {
         public void execute(Input input) {
             String courseName = input.ask("Enter course name :");
             List<Student> students = studentDAO.getStudentsByCourse(courseName);
-            if (students.size() == 0) {
-                System.out.println("Students have not found.");
+            if (students.isEmpty()) {
+                output.accept("Students have not found.");
             } else {
-                students.forEach(System.out::println);
+                for (Student student : students) {
+                    output.accept(student.toString());
+                }
             }
         }
     }

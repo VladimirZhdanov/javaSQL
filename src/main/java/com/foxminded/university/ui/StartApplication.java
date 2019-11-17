@@ -60,14 +60,9 @@ public class StartApplication {
      * @param input - input
      * @param output - output
      */
-    public StartApplication(Input input, Consumer<String> output) {
-        executorQuery = new ExecutorQuery();
-        configPostgres = new Config();
-        configUniversity = new Config();
-        configPostgres.loadProperties(POSTGRES_PROPERTIES);
-        configUniversity.loadProperties(UNIVERSITY_PROPERTIES);
-        this.dataSourcePostgres = new DataSource(configPostgres);
-        this.dataSourceUniversity = new DataSource(configUniversity);
+    public StartApplication(Input input, Consumer<String> output, DataSource dataSourcePostgres, DataSource dataSourceUniversity, ExecutorQuery executorQuery) {
+        this.dataSourcePostgres = dataSourcePostgres;
+        this.dataSourceUniversity = dataSourceUniversity;
         this.universitySQL = new UniversitySQL(dataSourcePostgres, dataSourceUniversity, executorQuery);
         this.groupDAO = new GroupSQL(dataSourceUniversity);
         this.studentDAO = new StudentSQL(dataSourceUniversity);
@@ -105,7 +100,14 @@ public class StartApplication {
      * @param args - args
      */
     public static void main(String[] args) {
+        Config configPost = new Config();
+        Config configUni = new Config();
+        configPost.loadProperties(POSTGRES_PROPERTIES);
+        configUni.loadProperties(UNIVERSITY_PROPERTIES);
+        DataSource dataSourcePost = new DataSource(configPost);
+        DataSource dataSourceUni = new DataSource(configUni);
+        ExecutorQuery executorQuery = new ExecutorQuery();
         new StartApplication(new ValidateInput(
-                new ConsoleInput()), System.out::println).init();
+                new ConsoleInput()), System.out::println, dataSourcePost, dataSourceUni, executorQuery).init();
     }
 }
