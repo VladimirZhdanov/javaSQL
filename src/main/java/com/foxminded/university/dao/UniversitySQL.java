@@ -32,7 +32,7 @@ public class UniversitySQL {
     /**
      * Generated data.
      */
-    private GenerationTestData generationTestData;
+    private GeneratorTestData generatorTestData;
 
     /**
      * Connection pool and connection fabric (postgres).
@@ -56,7 +56,7 @@ public class UniversitySQL {
         if (dataSourcePostgres == null && dataSourceUniversity == null) {
             throw new DAOException("Null was passed to the constructor...");
         }
-        generationTestData = new GenerationTestData();
+        generatorTestData = new GeneratorTestData();
         this.dataSourcePostgres = dataSourcePostgres;
         this.dataSourceUniversity = dataSourceUniversity;
         courseDAO = new CourseSQL(dataSourceUniversity);
@@ -73,9 +73,9 @@ public class UniversitySQL {
         executorQuery.execute(dataSourceUniversity, CREATE_TABLES);
 
         //get test data
-        List<Student> students = generationTestData.getStudents();
-        Set<Group> groups = generationTestData.getGroups();
-        List<Course> courses = generationTestData.getCourses();
+        List<Student> students = generatorTestData.getStudents();
+        Set<Group> groups = generatorTestData.getGroups();
+        List<Course> courses = generatorTestData.getCourses();
 
         //insert test data
         studentDAO.insert(students);
@@ -85,7 +85,7 @@ public class UniversitySQL {
         //get students and courses with id and generate relationship between students and courses
         students = studentDAO.getAllStudents();
         courses = courseDAO.getAllCourses();
-        students = generationTestData.assignCoursesToStudent(students, courses);
+        students = generatorTestData.assignCoursesToStudent(students, courses);
 
         //insert the relationship between students and courses
         studentDAO.insertRelationshipStudentsToCourses(students);

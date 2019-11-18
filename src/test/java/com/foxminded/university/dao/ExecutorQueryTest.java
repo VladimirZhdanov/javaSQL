@@ -7,6 +7,7 @@ import com.foxminded.university.domain.Student;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,6 +21,9 @@ import static org.mockito.Mockito.when;
  * @since 0.1
  */
 class ExecutorQueryTest {
+    public static final String STUDENT_FIRST_NAME = "Lord";
+    public static final String STUDENT_LAST_NAME = "Vladimir";
+
     public static final String DB_DRIVER = "org.h2.Driver";
     public static final String DB_URL = "jdbc:h2:mem:junitDB;DB_CLOSE_DELAY=-1";
     public static final String DB_USER = "";
@@ -55,11 +59,19 @@ class ExecutorQueryTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenStudentWasInsertedInExistentTable() {
+    public void shouldReturnTrueWhenStudentsWasInsertedInExistentTable() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        boolean actual = studentDAO.insert(new Student("Lord", "Vladimir"));
+        studentDAO.insert(new Student(2, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        studentDAO.insert(new Student(1, "Pop", "Bom"));
+        List<Student> students = studentDAO.getAllStudents();
+
+        boolean actual = false;
+
+        if (students.size() > 0 && students.get(0).getId() == 1 && students.get(0).getFirstName().equals(STUDENT_FIRST_NAME)) {
+            actual = true;
+        }
 
         assertTrue(actual,
-                "Should return true if student added in existent table");
+                "Should return true if students added in existent table");
     }
 }

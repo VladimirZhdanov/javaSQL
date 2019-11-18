@@ -16,7 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static java.lang.String.format;
+
+import static com.google.inject.internal.util.ImmutableList.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -26,19 +30,22 @@ import static org.mockito.Mockito.*;
  * @since 0.1
  */
 class StudentSQLTest {
+    public static final String STUDENT_FIRST_NAME = "Lord";
+    public static final String STUDENT_LAST_NAME = "Vladimir";
+
     public static final String DB_DRIVER = "org.h2.Driver";
     public static final String DB_URL = "jdbc:h2:mem:junitDB;DB_CLOSE_DELAY=-1";
     public static final String DB_USER = "";
     public static final String DB_PASSWORD = "";
 
-    private static final String CREATE_TABLES = "tablesCreation.SQL";
+    public static final String CREATE_TABLES = "tablesCreation.SQL";
     public static final String TABLES_DROP = "DROP TABLE IF EXISTS students, groups, courses, courses_connection;";
 
     public DataSource dataSource;
     public StudentDAO studentDAO;
     public CourseDAO courseDAO;
 
-    public GenerationTestData generationTestData = new GenerationTestData();
+    public GeneratorTestData generatorTestData = new GeneratorTestData();
     public ExecutorQuery executorQuery = new ExecutorQuery();
 
 
@@ -66,32 +73,39 @@ class StudentSQLTest {
     @Test
     public void shouldReturnCorrectedNameWhenAddNewStudentWithTheName() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        studentDAO.insert(generationTestData.getStudents()); //inserts 200 students
-        studentDAO.insert(new Student(1, "Lord", "Vladimir"));
-        Student student = studentDAO.getStudent(201);
-        String expected = "Lord";
+        studentDAO.insert(new Student(2, "Pop", "Bom"));
+        studentDAO.insert(new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        Student student = studentDAO.getStudent(2);
         String actual = student.getFirstName();
-        assertEquals(expected, actual,
-                "Should return firs name: Lord");
+        assertEquals(STUDENT_FIRST_NAME, actual,
+                format("Should return firs name: %s", STUDENT_FIRST_NAME));
     }
 
     @Test
-    public void shouldReturnTrueWhenRemoveStudent() {
+    public void shouldReturnNullWhenRemoveStudent() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        studentDAO.insert(generationTestData.getStudents()); //adds 200 students
-        boolean actual = studentDAO.removeStudentById(200);
-        assertTrue(actual,
-                "Should return true if student was removed");
+        studentDAO.insert(new Student(2, "Pop", "Bom"));
+        Student student = new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
+        studentDAO.insert(student);
+        if (studentDAO.removeStudentById(2)) {
+            student = studentDAO.getStudent(2);
+        }
+        assertNull(student, "Should return true if student was removed");
     }
 
     @Test
-    public void shouldReturnSizeMoreThanZeroWhenGetStudentByCourseName() {
+    public void shouldReturnCorrectedNameWhenGetStudentsByCourse() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        insertTestData();
-        List<Student> students = studentDAO.getStudentsByCourse("History");
-        boolean actual = students.size() > 0;
-        assertTrue(actual,
-                "Should return true if size of returned list was more than 0");
+        studentDAO.insert(new Student(2, "Pop", "Bom"));
+        studentDAO.insert(new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        courseDAO.insert(of(new Course("testName", "testDesc")));
+        studentDAO.insertCourseToStudentById(2, 1);
+
+        Student student = studentDAO.getStudentsByCourse("testName").get(0);
+
+        String actual = student.getFirstName();
+        assertEquals(STUDENT_FIRST_NAME, actual,
+                format("Should return firs name: %s", STUDENT_FIRST_NAME));
     }
 
     @Test
@@ -105,20 +119,21 @@ class StudentSQLTest {
     }
 
     @Test
-    public void shouldReturn200StudentWhenGetAllInsertedStudent() {
+    public void shouldReturnTwoStudentWhenGetAllInsertedStudent() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        studentDAO.insert(generationTestData.getStudents()); //adds 200 students
-        int expected = 200;
+        studentDAO.insert(new Student(2, "Pop", "Bom"));
+        studentDAO.insert(new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        int expected = 2;
         int actual = studentDAO.getAllStudents().size();
         assertEquals(expected, actual,
-                "Should return 200 students");
+                "Should return two students");
     }
 
     @Test
     public void shouldReturnTrueWhenCourseWasAddedToStudent() {
         executorQuery.execute(dataSource, CREATE_TABLES);
         insertTestData();
-        studentDAO.insert(new Student(1, "Lord", "Vladimir"));
+        studentDAO.insert(new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
         studentDAO.insertCourseToStudentById(201, 1);
         String courseName = courseDAO.getCourseById(1).getName();
         List<Course> courses = courseDAO.getCoursesByStudentId(201);
@@ -156,13 +171,13 @@ class StudentSQLTest {
     }
 
     private void insertTestData() {
-        List<Student> students = generationTestData.getStudents();
-        List<Course> courses = generationTestData.getCourses();
+        List<Student> students = generatorTestData.getStudents();
+        List<Course> courses = generatorTestData.getCourses();
         studentDAO.insert(students);
         courseDAO.insert(courses);
         students = studentDAO.getAllStudents();
         courses = courseDAO.getAllCourses();
-        students = generationTestData.assignCoursesToStudent(students, courses);
+        students = generatorTestData.assignCoursesToStudent(students, courses);
         studentDAO.insertRelationshipStudentsToCourses(students);
     }
 }

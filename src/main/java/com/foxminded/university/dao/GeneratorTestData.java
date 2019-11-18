@@ -1,13 +1,11 @@
 package com.foxminded.university.dao;
 
 import com.foxminded.university.domain.Course;
-import com.foxminded.university.domain.CoursesConnection;
 import com.foxminded.university.domain.Group;
 import com.foxminded.university.domain.Student;
 import com.foxminded.university.exceptions.DAOException;
 import java.util.*;
 
-import static java.util.Collections.shuffle;
 import static java.util.List.of;
 
 /**
@@ -16,7 +14,7 @@ import static java.util.List.of;
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
-public class GenerationTestData {
+public class GeneratorTestData {
     private static final String NULL_WAS_PASSED = "Null was passed";
 
     /**
@@ -37,7 +35,7 @@ public class GenerationTestData {
     /**
      * Constructor of the class.
      */
-    public GenerationTestData() {
+    public GeneratorTestData() {
         this.random = new Random();
         firstNames = of("Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", "Lucas",
                 "Mason", "Logan", "Alexander", "Ethan", "Jacob", "Michael", "Daniel", "Henry", "Jackson", "Sebastian", "Aiden", "Matthew");
