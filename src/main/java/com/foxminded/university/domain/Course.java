@@ -1,5 +1,7 @@
 package com.foxminded.university.domain;
 
+import java.util.Objects;
+
 /**
  * Course class.
  *
@@ -10,6 +12,25 @@ public class Course {
     private int id;
     private String name;
     private String description;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Course course = (Course) o;
+        return id == course.id
+                && Objects.equals(name, course.name)
+                && Objects.equals(description, course.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description);
+    }
 
     /**
      * Constructor of the class.

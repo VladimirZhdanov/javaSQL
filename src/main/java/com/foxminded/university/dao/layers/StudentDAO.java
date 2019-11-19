@@ -25,8 +25,9 @@ public interface StudentDAO {
      * Inserts passed students.
      *
      * @param students - students
+     * @return - added\didn't add - boolean
      */
-    void insert(List<Student> students);
+    boolean insert(List<Student> students);
 
     /**
      * Inserts relationship: Student - Course.

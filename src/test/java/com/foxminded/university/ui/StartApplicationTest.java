@@ -24,7 +24,6 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
@@ -33,10 +32,7 @@ import static org.mockito.Mockito.when;
 class StartApplicationTest {
     public static final String LINE_SEPARATOR = System.lineSeparator();
 
-    public static final String DB_DRIVER = "org.h2.Driver";
-    public static final String DB_URL = "jdbc:h2:mem:junitDB;DB_CLOSE_DELAY=-1";
-    public static final String DB_USER = "";
-    public static final String DB_PASSWORD = "";
+    public static final String PROPERTIES_PATH = "h2.properties";
 
     public static final String DROP_DB = "dropDB.SQL";
     public static final String CREATE_DB = "dataBaseCreation.SQL";
@@ -63,8 +59,7 @@ class StartApplicationTest {
         }
     };
 
-    @Mock
-    public Config mockedConfig;
+    public Config configH2 = new Config();
 
     @Mock
     public ExecutorQuery mockedExecutorQuery;
@@ -72,13 +67,10 @@ class StartApplicationTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(mockedConfig.getDriverName()).thenReturn(DB_DRIVER);
-        when(mockedConfig.getUrl()).thenReturn(DB_URL);
-        when(mockedConfig.getUser()).thenReturn(DB_USER);
-        when(mockedConfig.getPassword()).thenReturn(DB_PASSWORD);
+        configH2.loadProperties(PROPERTIES_PATH);
 
-        dataSourceJunitDB = new DataSource(mockedConfig);
-        dataSourceSecond = new DataSource(mockedConfig);
+        dataSourceJunitDB = new DataSource(configH2);
+        dataSourceSecond = new DataSource(configH2);
 
         doNothing().doNothing().doThrow(new RuntimeException()).when(mockedExecutorQuery).execute(dataSourceJunitDB, DROP_DB);
         doNothing().doThrow(new RuntimeException()).when(mockedExecutorQuery).execute(dataSourceJunitDB, CREATE_DB);

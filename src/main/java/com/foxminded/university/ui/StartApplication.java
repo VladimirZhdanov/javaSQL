@@ -7,7 +7,6 @@ import com.foxminded.university.dao.StudentSQL;
 import com.foxminded.university.dao.connection.Config;
 import com.foxminded.university.dao.UniversitySQL;
 import com.foxminded.university.dao.connection.DataSource;
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 

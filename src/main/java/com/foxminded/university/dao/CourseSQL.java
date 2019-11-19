@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static java.sql.Statement.NO_GENERATED_KEYS;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 /**
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
@@ -86,21 +87,30 @@ public class CourseSQL implements CourseDAO {
      * Inserts courses into the course table
      */
     @Override
-    public void insert(List<Course> courses) {
+    public boolean insert(List<Course> courses) {
+        int result = 0;
+
         if (courses == null) {
             throw new DAOException(NULL_WAS_PASSED);
         }
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertCourses"), NO_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertCourses"),
+                     RETURN_GENERATED_KEYS)) {
             for (Course course : courses) {
-                prepStatement.setString(1, course.getName());
-                prepStatement.setString(2, course.getDescription());
-                prepStatement.addBatch();
+                statement.setString(1, course.getName());
+                statement.setString(2, course.getDescription());
+                result = statement.executeUpdate();
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int id = generatedKeys.getInt(1);
+                        course.setId(id);
+                    }
+                }
             }
-            prepStatement.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return result == 1;
     }
 
     /**

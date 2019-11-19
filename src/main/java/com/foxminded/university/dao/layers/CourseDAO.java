@@ -11,8 +11,9 @@ public interface CourseDAO {
 
     /**
      * Inserts courses into the course table
+     * @return - added\didn't add - boolean
      */
-    void insert(List<Course> courses);
+    boolean insert(List<Course> courses);
 
     /**
      * Gets course by ID.

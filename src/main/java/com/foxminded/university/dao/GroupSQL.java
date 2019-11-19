@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import static java.sql.Statement.NO_GENERATED_KEYS;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 /**
  * DAO layer for the groups table.
@@ -87,20 +88,29 @@ public class GroupSQL implements GroupDAO {
      * @param groups - groups
      */
     @Override
-    public void insert(Set<Group> groups) {
+    public boolean insert(Set<Group> groups) {
+        int result = 0;
+
         if (groups == null) {
             throw new DAOException(NULL_WAS_PASSED);
         }
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertGroups"), NO_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertGroups"),
+                     RETURN_GENERATED_KEYS)) {
             for (Group group : groups) {
-                prepStatement.setString(1, group.getName());
-                prepStatement.addBatch();
+                statement.setString(1, group.getName());
+                result = statement.executeUpdate();
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int id = generatedKeys.getInt(1);
+                        group.setId(id);
+                    }
+                }
             }
-            prepStatement.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return result == 1;
     }
 
     /**

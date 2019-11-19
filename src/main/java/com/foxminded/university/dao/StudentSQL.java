@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static java.sql.Statement.NO_GENERATED_KEYS;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 /**
  * DAO layer for the students table.
@@ -71,28 +72,63 @@ public class StudentSQL implements StudentDAO {
      */
     @Override
     public boolean insert(Student student) {
+        boolean result = false;
+
         if (student == null) {
             throw new DAOException(NULL_WAS_PASSED);
         }
-        int result = 0;
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudent"),
-                     Statement.RETURN_GENERATED_KEYS)) {
-            prepStatement.setString(1, student.getFirstName());
-            prepStatement.setString(2, student.getLastName());
-            prepStatement.setInt(3, student.getGroupId());
-            result = prepStatement.executeUpdate();
-            try (ResultSet generatedKeys = prepStatement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int id = generatedKeys.getInt(1);
-                    student.setId(id);
-                }
-            }
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudent"),
+                     RETURN_GENERATED_KEYS)) {
+            result = insertStudentToDB(statement, student);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result == 1;
+        return result;
+    }
 
+    /**
+     * Inserts passed students.
+     *
+     * @param students - students
+     */
+    @Override
+    public boolean insert(List<Student> students) {
+        boolean result = false;
+
+        if (students == null) {
+            throw new DAOException(NULL_WAS_PASSED);
+        }
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(properties.getProperty("insertStudents"),
+                     RETURN_GENERATED_KEYS)) {
+            for (Student student : students) {
+                result = insertStudentToDB(statement, student);
+            }
+            statement.executeBatch();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private boolean insertStudentToDB(PreparedStatement statement, Student student) throws SQLException {
+        int result = 0;
+
+        statement.setString(1, student.getFirstName());
+        statement.setString(2, student.getLastName());
+        statement.setInt(3, student.getGroupId());
+        result = statement.executeUpdate();
+        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                int id = generatedKeys.getInt(1);
+                student.setId(id);
+            }
+        }
+        return result == 1;
     }
 
     /**
@@ -159,30 +195,6 @@ public class StudentSQL implements StudentDAO {
             e.printStackTrace();
         }
         return students;
-    }
-
-    /**
-     * Inserts passed students.
-     *
-     * @param students - students
-     */
-    @Override
-    public void insert(List<Student> students) {
-        if (students == null) {
-            throw new DAOException(NULL_WAS_PASSED);
-        }
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement prepStatement = connection.prepareStatement(properties.getProperty("insertStudents"), NO_GENERATED_KEYS)) {
-            for (Student student : students) {
-                prepStatement.setString(1, student.getFirstName());
-                prepStatement.setString(2, student.getLastName());
-                prepStatement.setInt(3, student.getGroupId());
-                prepStatement.addBatch();
-            }
-            prepStatement.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

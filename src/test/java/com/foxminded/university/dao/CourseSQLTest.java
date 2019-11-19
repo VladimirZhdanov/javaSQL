@@ -13,31 +13,21 @@ import java.sql.SQLException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static java.lang.String.format;
 
 import static com.google.inject.internal.util.ImmutableList.of;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Vladimir Zhdanov (mailto:constHomeSpb@gmail.com)
  * @since 0.1
  */
 class CourseSQLTest {
-    public static final String COURSE_NAME_ONE = "testNameOne";
-    public static final String COURSE_DESC_ONE = "testDescOne";
-    public static final String COURSE_NAME_TWO = "testNameTwo";
-    public static final String COURSE_DESC_TWO = "testDescTwo";
-    public static final String STUDENT_FIRST_NAME = "Lord";
-    public static final String STUDENT_LAST_NAME = "Vladimir";
+    public Student studentOne;
+    public Student studentTwo;
+    public Course courseOne;
+    public Course courseTwo;
 
-    public static final String DB_DRIVER = "org.h2.Driver";
-    public static final String DB_URL = "jdbc:h2:mem:junitDB;DB_CLOSE_DELAY=-1";
-    public static final String DB_USER = "";
-    public static final String DB_PASSWORD = "";
+    public static final String PROPERTIES_PATH = "h2.properties";
 
     private static final String CREATE_TABLES = "tablesCreation.SQL";
     public static final String TABLES_DROP = "DROP TABLE IF EXISTS students, groups, courses, courses_connection;";
@@ -49,18 +39,13 @@ class CourseSQLTest {
     public GeneratorTestData generatorTestData = new GeneratorTestData();
     public ExecutorQuery executorQuery = new ExecutorQuery();
 
-
-    @Mock
-    public Config mockedConfig;
+    public Config configH2 = new Config();
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        when(mockedConfig.getDriverName()).thenReturn(DB_DRIVER);
-        when(mockedConfig.getUrl()).thenReturn(DB_URL);
-        when(mockedConfig.getUser()).thenReturn(DB_USER);
-        when(mockedConfig.getPassword()).thenReturn(DB_PASSWORD);
-        dataSource = new DataSource(mockedConfig);
+        configH2.loadProperties(PROPERTIES_PATH);
+
+        dataSource = new DataSource(configH2);
         studentDAO = new StudentSQL(dataSource);
         courseDAO = new CourseSQL(dataSource);
         try (Connection connection = dataSource.getConnection();
@@ -69,63 +54,52 @@ class CourseSQLTest {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        studentOne = new Student(1, "Lord", "Vladimir");
+        studentTwo = new Student(2, "Pop", "Bom");
+        courseOne = new Course("testNameOne", "testDescOne");
+        courseTwo = new Course("testNameTwo", "testDescTwo");
     }
 
 
 
     @Test
-    public void shouldReturnCorrectedNameWhenGetCourseById() {
+    public void shouldReturnCorrectedCourseWhenGetCourseById() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        courseDAO.insert(of(new Course(COURSE_NAME_ONE, COURSE_DESC_ONE),
-                new Course(COURSE_NAME_TWO, COURSE_DESC_TWO)));
+        courseDAO.insert(of(courseOne, courseTwo));
 
-        String actual = courseDAO.getCourseById(1).getName();
-        assertEquals(COURSE_NAME_ONE, actual,
-                format("Should return group name: %s", COURSE_NAME_ONE));
+        Course courseActual = courseDAO.getCourseById(1);
+        assertEquals(courseOne, courseActual,
+                "Should return corrected course when get course bu id");
     }
 
     @Test
     public void shouldReturnTwoCoursesWhenGetAllCourses() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        courseDAO.insert(of(new Course(COURSE_NAME_ONE, COURSE_DESC_ONE),
-                new Course(COURSE_NAME_TWO, COURSE_DESC_TWO)));
+        courseDAO.insert(of(courseOne, courseTwo));
 
-        int actual = courseDAO.getAllCourses().size();
-        int expected = 2;
-        assertEquals(expected, actual,
-                "Should return 2 courses");
+        List<Course> coursesActual = courseDAO.getAllCourses();
+
+        boolean result = false;
+        if (coursesActual.size() == 2 && coursesActual.get(0).equals(courseOne)) {
+            result = true;
+        }
+        assertTrue(result,
+                "Should return true if get corrected courses");
     }
 
     @Test
-    public void shouldReturnCorrectedCourseNameWhenGetCoursesByStudentId1() {
+    public void shouldReturnCorrectedCourseWhenGetCoursesByStudentId() {
         executorQuery.execute(dataSource, CREATE_TABLES);
-        studentDAO.insert(new Student(2, "Pop", "Bom"));
-        studentDAO.insert(new Student(1, STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
-        courseDAO.insert(of(new Course(COURSE_NAME_ONE, COURSE_DESC_ONE),
-                new Course(COURSE_NAME_TWO, COURSE_DESC_TWO)));
-        studentDAO.insertCourseToStudentById(1, 1);
-        studentDAO.insertCourseToStudentById(2, 2);
+        studentDAO.insert(studentOne);
+        studentDAO.insert(studentTwo);
+        courseDAO.insert(of(courseOne, courseTwo));
+        studentDAO.insertCourseToStudentById(1, 2);
+        studentDAO.insertCourseToStudentById(2, 1);
 
-        Course course = courseDAO.getCoursesByStudentId(1).get(0);
-
-        String actual = course.getName();
-        String expected = COURSE_NAME_ONE;
-        assertEquals(expected, actual,
-                "Should return corrected course name when get courses by student id");
-    }
-
-    @Test
-    public void shouldReturnCorrectedCourseNameWhenGetCoursesByStudentId2() {
-        executorQuery.execute(dataSource, CREATE_TABLES);
-        courseDAO.insert(generatorTestData.getCourses());
-        studentDAO.insert(new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
-        studentDAO.insertCourseToStudentById(1, 1);
-
-        String actual = courseDAO.getCoursesByStudentId(1).get(0).getName();
-        String expected = courseDAO.getCourseById(1).getName();
-
-        assertEquals(expected, actual,
-                "Should return group name: Architecture");
+        Course courseActual = courseDAO.getCoursesByStudentId(1).get(0);
+        assertEquals(courseTwo, courseActual,
+                "Should return corrected course when get courses by student id");
     }
 
     @Test
@@ -133,7 +107,7 @@ class CourseSQLTest {
         executorQuery.execute(dataSource, CREATE_TABLES);
         insertTestData();
 
-        studentDAO.insert(new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        studentDAO.insert(studentOne);
         studentDAO.insertCourseToStudentById(201, 1);
         studentDAO.insertCourseToStudentById(201, 2);
         studentDAO.insertCourseToStudentById(201, 3);

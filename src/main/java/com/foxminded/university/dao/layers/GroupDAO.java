@@ -16,8 +16,9 @@ public interface GroupDAO {
      * Inserts passed groups.
      *
      * @param groups - groups
+     * @return - added\didn't add - boolean
      */
-    void insert(Set<Group> groups);
+    boolean insert(Set<Group> groups);
 
     /**
      * Finds all groups related to the passed amount of students.
