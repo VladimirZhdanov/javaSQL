@@ -52,7 +52,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnUrlWhenGetURL() {
+    public void shouldReturnMockedUrlWhenGetURL() {
         config.loadProperties(mockedProperties);
         String actualURL = config.getUrl();
         assertEquals(DB_URL, actualURL,
@@ -60,7 +60,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnUserWhenGetUser() {
+    public void shouldReturnMockedUserWhenGetUser() {
         config.loadProperties(mockedProperties);
         String actualUser = config.getUser();
         assertEquals(DB_USER, actualUser,
@@ -68,7 +68,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnPasswordWhenGetPassword() {
+    public void shouldReturnMockedPasswordWhenGetPassword() {
         config.loadProperties(mockedProperties);
         String actualPassword = config.getPassword();
         assertEquals(DB_PASSWORD, actualPassword,
@@ -76,7 +76,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnDriverWhenGetDriver() {
+    public void shouldReturnMockedDriverWhenGetDriver() {
         config.loadProperties(mockedProperties);
         String actualDriver = config.getDriverName();
         assertEquals(DB_DRIVER, actualDriver,
@@ -84,7 +84,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnUrlWhenGetURLSituationTwo() {
+    public void shouldReturnRealUrlWhenGetURL() {
         config.loadProperties(PROPERTIES_PATH);
         String actualURL = config.getUrl();
         assertEquals(POSTGRES_URL, actualURL,
@@ -92,7 +92,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnUserWhenGetUserSituationTwo() {
+    public void shouldReturnRealUserWhenGetUser() {
         config.loadProperties(PROPERTIES_PATH);
         String actualUser = config.getUser();
         assertEquals(POSTGRES_USER, actualUser,
@@ -100,7 +100,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnPasswordWhenGetPasswordSituationTwo() {
+    public void shouldReturnRealPasswordWhenGetPassword() {
         config.loadProperties(PROPERTIES_PATH);
         String actualPassword = config.getPassword();
         assertEquals(POSTGRES_PASSWORD, actualPassword,
@@ -108,7 +108,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnDriverWhenGetDriverSituationTwo() {
+    public void shouldReturnRealDriverWhenGetDriver() {
         config.loadProperties(PROPERTIES_PATH);
         String actualDriver = config.getDriverName();
         assertEquals(POSTGRES_DRIVER, actualDriver,
