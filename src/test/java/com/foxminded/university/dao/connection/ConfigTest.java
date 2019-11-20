@@ -84,7 +84,7 @@ class ConfigTest {
     }
 
     @Test
-    public void shouldReturnUrlWhenGetURL2() {
+    public void shouldReturnUrlWhenGetURLSituationTwo() {
         config.loadProperties(PROPERTIES_PATH);
         String actualURL = config.getUrl();
         assertEquals(POSTGRES_URL, actualURL,
