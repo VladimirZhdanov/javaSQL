@@ -145,28 +145,21 @@ class StudentSQLTest {
     }
 
     @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed1() {
+    public void shouldThrowDAOExceptionWhenNullWasPassedToInsertStudent() {
         Exception exception = assertThrows(DAOException.class, () ->
                 studentDAO.insert((Student) null));
         assertEquals("Null was passed", exception.getMessage());
     }
 
     @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed2() {
-        Exception exception = assertThrows(DAOException.class, () ->
-                studentDAO.insert((List<Student>) null));
-        assertEquals("Null was passed", exception.getMessage());
-    }
-
-    @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed3() {
+    public void shouldThrowDAOExceptionWhenNullWasPassedToInsertRelationshipStudentsToCourses() {
         Exception exception = assertThrows(DAOException.class, () ->
                 studentDAO.insertRelationshipStudentsToCourses(null));
         assertEquals("Null was passed", exception.getMessage());
     }
 
     @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed4() {
+    public void shouldThrowDAOExceptionWhenNullWasPassedToGetStudentsByCourse() {
         Exception exception = assertThrows(DAOException.class, () ->
                 studentDAO.getStudentsByCourse(null));
         assertEquals("Null was passed", exception.getMessage());

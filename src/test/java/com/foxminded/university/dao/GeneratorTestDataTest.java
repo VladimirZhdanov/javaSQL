@@ -58,14 +58,14 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenGenerateTestDataAndGetGroups1() {
+    public void shouldReturnTrueWhenGenerateTestDataAndGetGroups() {
         boolean actual = generatorTestData.getGroups().size() > 0;
         assertTrue(actual,
                 "Should return true if list of groups more than 0");
     }
 
     @Test
-    public void shouldReturnTrueWhenGenerateTestDataAndGetGroups2() {
+    public void shouldReturnNullWhenGenerateTestDataAndGetGroups() {
         String name = generatorTestData.getGroups().iterator().next().getName();
         boolean actual = false;
 
@@ -86,7 +86,7 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudent1() {
+    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudent() {
         List<Student> students = generatorTestData.getStudents();
         List<Course> courses = generatorTestData.getCourses();
         students = generatorTestData.assignCoursesToStudent(students, courses);
@@ -97,7 +97,7 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudent2() {
+    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudentSituationTwo() {
         List<Student> students = generatorTestData.getStudents();
         List<Course> courses = generatorTestData.getCourses();
         students = generatorTestData.assignCoursesToStudent(students, courses);
@@ -108,7 +108,7 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudent3() {
+    public void shouldReturnTrueWhenAssignCoursesToStudentAndCheckSizeOfCoursesInRandomStudentSituationThree() {
         List<Student> students = generatorTestData.getStudents();
         List<Course> courses = generatorTestData.getCourses();
         students = generatorTestData.assignCoursesToStudent(students, courses);
@@ -119,7 +119,7 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed1() {
+    public void shouldThrowDAOExceptionWhenNullWasPassedToAssignCoursesToStudent() {
         List<Course> courses = generatorTestData.getCourses();
         Exception exception = assertThrows(DAOException.class, () ->
                 generatorTestData.assignCoursesToStudent(null, courses));
@@ -127,17 +127,10 @@ class GeneratorTestDataTest {
     }
 
     @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed2() {
+    public void shouldThrowDAOExceptionWhenNullWasPassedToAssignCoursesToStudentSituationTwo() {
         List<Student> students = generatorTestData.getStudents();
         Exception exception = assertThrows(DAOException.class, () ->
                 generatorTestData.assignCoursesToStudent(students, null));
-        assertEquals("Null was passed", exception.getMessage());
-    }
-
-    @Test
-    public void shouldThrowDAOExceptionWhenNullWasPassed3() {
-        Exception exception = assertThrows(DAOException.class, () ->
-                generatorTestData.assignCoursesToStudent(null, null));
         assertEquals("Null was passed", exception.getMessage());
     }
 }
