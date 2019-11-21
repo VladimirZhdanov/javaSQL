@@ -63,20 +63,27 @@ class StudentSQLTest {
 
 
     @Test
-    public void shouldReturnTrueWhenInsertStudents() {
+    public void shouldReturnCorrectedStudentWhenInsertStudentsAndGetStudentOne() {
         executorQuery.execute(dataSource, CREATE_TABLES);
         studentDAO.insert(studentOne);
         studentDAO.insert(studentTwo);
 
         Student studentOneActual = studentDAO.getStudent(1);
+
+        assertEquals(studentOne, studentOneActual,
+                "Should return corrected student if students was correctly inserted and get");
+    }
+
+    @Test
+    public void shouldReturnCorrectedStudentWhenInsertStudentsAndGetStudentTwo() {
+        executorQuery.execute(dataSource, CREATE_TABLES);
+        studentDAO.insert(studentOne);
+        studentDAO.insert(studentTwo);
+
         Student studentTwoActual = studentDAO.getStudent(2);
 
-        boolean result = false;
-        if (studentOneActual.equals(studentOne) && studentTwoActual.equals(studentTwo)) {
-            result = true;
-        }
-        assertTrue(result,
-                "Should return true if students was correctly inserted");
+        assertEquals(studentTwo, studentTwoActual,
+                "Should return corrected student if students was correctly inserted and get");
     }
 
     @Test
