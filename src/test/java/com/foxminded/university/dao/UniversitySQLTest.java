@@ -33,6 +33,11 @@ class UniversitySQLTest {
     private static final String CREATE_DB = "dataBaseCreation.SQL";
     private static final String CREATE_TABLES = "tablesCreation.SQL";
 
+    private static final String STUDENTS_TABLE = "STUDENTS";
+    private static final String COURSES_TABLE = "COURSES";
+    private static final String GROUP_TABLE = "GROUPS";
+    private static final String COURSES_CONNECTION_TABLE = "COURSES_CONNECTION";
+
     public static final String TABLES_DROP = "DROP TABLE IF EXISTS students, groups, courses, courses_connection;";
 
     public StudentDAO studentDAO;
@@ -112,12 +117,8 @@ class UniversitySQLTest {
 
         boolean actual = false;
 
-        try (Connection conn = dataSourceJunitDB.getConnection()) {
-            ResultSet resultSet = conn.getMetaData()
-                    .getTables(null, null, "STUDENTS", null);
-            if (resultSet.next()) {
-                actual = true;
-            }
+        try (Connection connection = dataSourceJunitDB.getConnection()) {
+            actual = checkTableExistence(connection, STUDENTS_TABLE);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -131,7 +132,7 @@ class UniversitySQLTest {
         universitySQL.setDateBase();
         boolean actual = false;
         try (Connection connection = dataSourceJunitDB.getConnection()) {
-            actual = checkTableExistence(connection, "GROUPS");
+            actual = checkTableExistence(connection, GROUP_TABLE);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -145,7 +146,7 @@ class UniversitySQLTest {
         universitySQL.setDateBase();
         boolean actual = false;
         try (Connection connection = dataSourceJunitDB.getConnection()) {
-            actual = checkTableExistence(connection, "COURSES");
+            actual = checkTableExistence(connection, COURSES_TABLE);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -159,7 +160,7 @@ class UniversitySQLTest {
         universitySQL.setDateBase();
         boolean actual = false;
         try (Connection connection = dataSourceJunitDB.getConnection()) {
-            actual = checkTableExistence(connection, "COURSES_CONNECTION");
+            actual = checkTableExistence(connection, COURSES_CONNECTION_TABLE);
         } catch (SQLException e) {
             e.printStackTrace();
         }
