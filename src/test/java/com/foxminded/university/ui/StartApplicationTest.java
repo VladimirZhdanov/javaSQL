@@ -101,7 +101,7 @@ class StartApplicationTest {
     }
 
     @Test
-    public void shouldReturn199StudentsWhenRemove200thStudent() {
+    public void shouldReturnCorrectedStudentsWhenRemoveOneStudent() {
         Input input = new SimulateInput(Arrays.asList("3", "200", "6"));
         StartApplication startApplication = new StartApplication(input, output, dataSourceJunitDB, dataSourceJunitDB, mockedExecutorQuery);
         startApplication.init();

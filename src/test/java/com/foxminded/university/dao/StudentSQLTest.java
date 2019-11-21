@@ -123,12 +123,8 @@ class StudentSQLTest {
 
         List<Student> studentsActual = studentDAO.getAllStudents();
 
-        boolean result = false;
-        if (studentsActual.size() == 2 && studentsActual.get(0).equals(studentOne)) {
-            result = true;
-        }
-        assertTrue(result,
-                "Should return true if get corrected students");
+        assertEquals(List.of(studentOne, studentTwo), studentsActual,
+                "Should return corrected students when get all students");
     }
 
     @Test

@@ -74,19 +74,36 @@ class UniversitySQLTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenSetDataBaseAndItSetAndInsertedWithTestData() {
+    public void shouldReturnTrueWhenGetAllStudents() {
         universitySQL.setDateBase();
         List<Student> students = studentDAO.getAllStudents();
+
+        boolean actual = students.size() != 0;
+
+        assertTrue(actual,
+                "Should return true if student tables was created and inserted");
+    }
+
+    @Test
+    public void shouldReturnTrueWhenGetAllCourses() {
+        universitySQL.setDateBase();
         List<Course> courses = courseDAO.getAllCourses();
+
+        boolean actual = courses.size() != 0;
+
+        assertTrue(actual,
+                "Should return true if courses tables was created and inserted");
+    }
+
+    @Test
+    public void shouldReturnTrueWhenGetGroupsByStudentCount() {
+        universitySQL.setDateBase();
         List<Group> groups = groupDAO.getGroupsByStudentCount(30);
 
-        boolean actual = false;
+        boolean actual = groups.size() != 0;
 
-        if (students.size() != 0 && courses.size() != 0 && groups.size() != 0) {
-            actual = true;
-        }
         assertTrue(actual,
-                "Should return true if tables was created and inserted");
+                "Should return true if groups tables was created and inserted");
     }
 
     @Test
@@ -113,12 +130,8 @@ class UniversitySQLTest {
     public void shouldReturnTrueWhenCheckExistenceOfGroupsTable() {
         universitySQL.setDateBase();
         boolean actual = false;
-        try (Connection conn = dataSourceJunitDB.getConnection()) {
-            ResultSet resultSet = conn.getMetaData()
-                    .getTables(null, null, "GROUPS", null);
-            if (resultSet.next()) {
-                actual = true;
-            }
+        try (Connection connection = dataSourceJunitDB.getConnection()) {
+            actual = checkTableExistence(connection, "GROUPS");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -131,12 +144,8 @@ class UniversitySQLTest {
     public void shouldReturnTrueWhenCheckExistenceOfCoursesTable() {
         universitySQL.setDateBase();
         boolean actual = false;
-        try (Connection conn = dataSourceJunitDB.getConnection()) {
-            ResultSet resultSet = conn.getMetaData()
-                    .getTables(null, null, "COURSES", null);
-            if (resultSet.next()) {
-                actual = true;
-            }
+        try (Connection connection = dataSourceJunitDB.getConnection()) {
+            actual = checkTableExistence(connection, "COURSES");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -149,17 +158,23 @@ class UniversitySQLTest {
     public void shouldReturnTrueWhenCheckExistenceOfCoursesConnectionTable() {
         universitySQL.setDateBase();
         boolean actual = false;
-        try (Connection conn = dataSourceJunitDB.getConnection()) {
-            ResultSet resultSet = conn.getMetaData()
-                    .getTables(null, null, "COURSES_CONNECTION", null);
-            if (resultSet.next()) {
-                actual = true;
-            }
+        try (Connection connection = dataSourceJunitDB.getConnection()) {
+            actual = checkTableExistence(connection, "COURSES_CONNECTION");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         assertTrue(actual,
                 "Should return true if courses_connection table is exist");
+    }
+
+    public boolean checkTableExistence(Connection connection, String tableName) throws SQLException {
+        boolean result = false;
+        ResultSet resultSet = connection.getMetaData()
+                .getTables(null, null, tableName, null);
+        if (resultSet.next()) {
+            result = true;
+        }
+        return result;
     }
 }
