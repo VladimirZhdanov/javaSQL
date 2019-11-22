@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS university;
+DROP USER IF EXISTS admin;
