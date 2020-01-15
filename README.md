@@ -1,5 +1,5 @@
 
-Task 7 - SQL
+Task:
  Create an application that inserts/updates/deletes data in the database using JDBC.
 Use PostgreSQL DB.
 
